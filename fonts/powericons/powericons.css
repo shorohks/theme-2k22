@@ -1,0 +1,107 @@
+@font-face {
+  font-family: 'powericons';
+  src:  url('powericons.eot?er4j69');
+  src:  url('powericons.eot?er4j69#iefix') format('embedded-opentype'),
+    url('powericons.ttf?er4j69') format('truetype'),
+    url('powericons.woff?er4j69') format('woff'),
+    url('powericons.svg?er4j69#powericons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="powericon-"], [class*=" powericon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'powericons' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.powericon-trash:before {
+  content: "\f014";
+}
+.powericon-exclamation_sign:before {
+  content: "\f06a";
+}
+.powericon-spinner:before {
+  content: "\f110";
+}
+.powericon-menu:before {
+  content: "\e902";
+}
+.powericon-light-bulb:before {
+  content: "\e901";
+}
+.powericon-electric-plug:before {
+  content: "\e900";
+}
+.powericon-phone:before {
+  content: "\e904";
+}
+.powericon-mail:before {
+  content: "\e903";
+}
+.powericon-home:before {
+  content: "\e905";
+}
+.powericon-clock:before {
+  content: "\e906";
+}
+.powericon-bookmark:before {
+  content: "\ea16";
+}
+.powericon-cart:before {
+  content: "\ea4d";
+}
+.powericon-lamp:before {
+  content: "\eabc";
+}
+.powericon-balance:before {
+  content: "\eb39";
+}
+.powericon-close:before {
+  content: "\ec2a";
+}
+.powericon-shield:before {
+  content: "\e907";
+}
+.powericon-refresh:before {
+  content: "\e908";
+}
+.powericon-help:before {
+  content: "\e909";
+}
+.powericon-pulse {
+  -webkit-animation: fa-spin 1s infinite steps(8);
+  animation: fa-spin 1s infinite steps(8);
+  display: inline-block;
+  vertical-align: text-top;
+}
+@-webkit-keyframes fa-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}

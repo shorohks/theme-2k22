@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+.breadcrumb {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	font-size: 0.867em;
+	display: flex;
+	overflow: hidden;
+}
+
+.breadcrumb li {
+	white-space: nowrap;
+	color: var(--breadcrumb-color);
+}
+
+.breadcrumb>li+li:before {
+	content: ">";
+	padding-right: 2px;
+	padding-left: 5px;
+	color: var(--breadcrumb-color);
+}
+
+.breadcrumb  a {
+	color: var(--breadcrumb-color);
+	text-decoration: none;
+}

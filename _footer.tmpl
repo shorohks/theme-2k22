@@ -1,0 +1,38 @@
+<footer>
+  <div class="container">
+    <div class="contacts">
+      <div>
+        <i class="icon powericon-mail"></i>
+        <div>
+          Наша почта
+          <a href="mailto:<TMPL_IF NAME='EMAIL'><TMPL_VAR NAME='EMAIL'><TMPL_ELSE>info@<TMPL_VAR NAME='HTTP_HOST'></TMPL_IF>"><TMPL_IF NAME="EMAIL"><TMPL_VAR NAME="EMAIL"><TMPL_ELSE>info@<TMPL_VAR NAME="HTTP_HOST"></TMPL_IF></a>
+        </div>
+      </div>
+      <div>
+        <i class="icon powericon-phone"></i>
+        <div class="">
+          Телефон
+          <a href="tel:<TMPL_VAR NAME='PHONE'>">8&nbsp;<TMPL_VAR NAME='PHONE_CODE'>&nbsp;<TMPL_VAR NAME='PHONE_NUM'></a>
+        </div>
+      </div>
+      <div>
+        <i class="icon powericon-home"></i>
+        <div class="">
+          Москва
+          <div>ул.Таганская, д.1</div>
+        </div>
+      </div>
+      <div>
+        <i class="icon powericon-clock"></i>
+        <div class="">
+          Режим работы
+          <div>Круглосуточно</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      Мы используем файлы cookie, чтобы предоставить пользователям больше возможностей при посещении сайта интернет-магазина.
+      Содержание сайта не является рекомендацией или офертой, вся информация носит исключительно ознакомительный характер.
+    </div>
+  </div>
+</footer>

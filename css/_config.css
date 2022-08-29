@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+:root {
+	--font-default: 15px/1.15 "Roboto", "Arial", sans-serif;
+	--color-default: #001a34;
+	--link-color-default: #0d6efd;
+
+	--header-background-color: white;
+	--header-shadow: 0 5px 5px rgb(136 145 157 / 10%), 0 1px 0 #e6eaed;
+
+	--appbar-padding: 0.6em 0 0.7em 0;
+	--appbar-shadow: 0 1px 0 #e6eaed;
+	--appbar-logo-size: 2.5em;
+	--appbar-logo-background-color: #fedd2e;
+	--appbar-logo-color: black;
+	--appbar-title-font: 1.5em 'Yanone Kaffeesatz', sans-serif;
+	--appbar-title-color: #444444;
+	--appbar-schedule-workday-color: #35ab01;
+	--appbar-schedule-weekend-color: #c41e3a;
+	--appbar-icon-size: 1.7em;
+	--appbar-icon-color: #5f6368;
+
+	--appbar-mobile-font-size: 12px;
+	--appbar-mobile-background-color: white;
+	--appbar-mobile-shadow: 0 5px 5px rgb(136 145 157 / 10%), 0 1px 0 #e6eaed;
+	--appbar-mobile-title-font: 700 1.5em/1.15 "Roboto", "Arial", sans-serif;
+
+	--nav-color: #0d6efd;
+	--nav-font-size: 0.96em;
+	--nav-font-weight: 700;
+	--nav-gap: 2em;
+
+	--catalog-btn-background: #f5f8fa;
+	--catalog-color: #0d6efd;
+	--catalog-chevron-color: #0d6efd;
+	--catalog-background-color: white;
+	--catalog-border: solid 1px #dadce0;
+	--catalog-shadow: 9px 9px 9px 3px rgba(41,41,41,.25);
+
+	--catalog-mobile-btn-color: #0d6efd;
+
+	--footer-color: #88919D;
+	--footer-font-size: 0.866667em;
+	--footer-background-color: #F5F8FA;
+	--footer-border: 1px solid #e6eaed;
+	--footer-padding-bottom: 1rem;
+
+	--breadcrumb-color: #88919D;
+}

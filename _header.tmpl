@@ -1,0 +1,34 @@
+<header>
+    <div class="container appbar-shadow">
+      <div class="appbar">
+        <a href="/" class="logo"><i class="powericon-electric-plug"></i></a>
+        <a href="/" class="title">
+          <div class="caption"><TMPL_IF NAME="SITE_NAME"><TMPL_VAR NAME="SITE_NAME"><TMPL_ELSE><TMPL_VAR NAME="HTTP_HOST"></TMPL_IF></div>
+          <div class="subcaption">Интернет-магазин</div>
+        </a>
+        <div class="phone">+7 (<TMPL_VAR NAME="PHONE_CODE">) <TMPL_VAR NAME="PHONE_NUM"></div>
+        <div class="schedule">
+          <div class="dow"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+          <div class="workday">07:00 - 23:30</div>
+          <div class="weekend">09:00 - 23:30</div>
+        </div>
+        <a href="#" class="icon"><i class="powericon-balance"></i></a>
+        <a href="#" class="icon"><i class="powericon-bookmark"></i></a>
+        <a href="cart.php" class="icon counter"><i class="powericon-cart"></i><sup><TMPL_VAR NAME="CART_COUNT"></sup></a>
+      </div>
+    </div>
+
+    <div class="menu container">
+      <div>
+        <div>
+          <TMPL_INCLUDE FILE="_catalog.tmpl">
+        </div>
+      </div>
+      <nav class="scrollable unselectable">
+        <a href="page.php?page=delivery">Оплата и доставка</a>
+        <a href="page.php?page=service">Монтаж и подключение</a>
+        <a href="page.php?page=garantee">Гарантия</a>
+        <a href="page.php?page=contacts">Контакты</a>
+      </nav>
+    </div>
+</header>

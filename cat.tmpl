@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru-RU">
+<head>
+  <title><TMPL_VAR NAME='title'></title>
+  <meta name="description" content="<TMPL_VAR NAME="description">" />
+  <meta name="keywords" content="<TMPL_VAR NAME="keywords">" />
+  <TMPL_INCLUDE FILE="_meta.tmpl">
+</head>
+<body>
+  <TMPL_INCLUDE FILE="_header.tmpl">
+
+  <div class="container">
+
+    <h1><TMPL_VAR NAME='caption'></h1>
+    <div class="items-list">
+      <TMPL_IF NAME='products'>
+        <TMPL_LOOP NAME='products'>
+          <TMPL_INCLUDE FILE="_item.tmpl" MODE="INLINE">
+        </TMPL_LOOP>
+      </TMPL_IF>
+    </div>
+
+  </div>
+
+  <TMPL_INCLUDE FILE="_footer.tmpl">
+</body>
+</html>

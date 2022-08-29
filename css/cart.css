@@ -1,0 +1,261 @@
+@charset "UTF-8";
+
+#checkoutpage {
+	display: grid;
+	grid-template-columns: 2.8fr 1fr;
+	grid-template-areas: "cartapp sidebar";
+}
+
+#cartapp {
+	grid-area: cartapp;
+	padding-right: 1.5em;
+}
+
+#sidebar {
+	grid-area: sidebar;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5em;
+	padding-left: 1.5em;
+	border-left: solid 1px #e6e6e6;
+	color: #666666;
+	font-size: 0.9em;
+}
+
+#sidebar i {
+	display: block;
+	font-size: 2.7em;
+	color: #bdbdbd;
+	padding-top: 0.5em;
+}
+
+#sidebar b {
+	display: block;
+	font-size: 1.1em;
+	margin-top: 1em;
+	margin-bottom: 0.5em;
+	color: #5a5a5a;
+}
+
+.cart {
+	line-height: 1em;
+}
+
+.cart > div {
+	display: grid;
+	grid-template-columns: 0.5fr 3fr 1fr 1fr 1fr 0.5fr;
+	grid-template-areas: "pic product price qty amount trash";
+	gap: 1.5em;
+	border-top: solid 1px #e6e6e6;
+	padding: 0.75em 0 0.75em 0;
+}
+
+.cart > div:not(.summary):hover {
+	background-color: #f5f8fa;
+}
+
+.cart > div > div {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.cart > div > div:nth-child(1n+3) {
+	text-align: right;
+}
+
+.cart > div > div:last-child {
+	text-align: center;
+}
+
+.cart .pic {
+	grid-area: pic;
+}
+
+.cart  div.pic a {
+	line-height: 0;
+}
+
+.cart .pic img {
+	max-width: 100%;
+}
+
+.cart .product {
+	grid-area: product;
+	line-height: 1.6;
+}
+
+.cart .product a {
+	text-decoration: none;
+	color: var(--color-default);
+}
+
+.cart .product span {
+	display: block;
+	color: #88919d;
+	font-size: 0.8666em;
+	/*margin-bottom: 0.5em;*/
+}
+
+.cart .product a.address {
+	display: block;
+	color: var(--link-color-default);
+	font-size: 0.86rem;
+	/*margin-top: 0.5rem;*/
+}
+
+.cart .product a.address i {
+	color: red;
+}
+
+.cart .price {
+	grid-area: price;
+	white-space: nowrap;
+}
+
+.cart .qty {
+	grid-area: qty;
+}
+
+.cart .amount {
+	grid-area: amount;
+	white-space: nowrap;
+}
+
+.cart .trash {
+	grid-area: trash;
+}
+
+.cart .trash a {
+	text-decoration: none;
+	font-size: 1.5em;
+	color: #bdbdbd;
+}
+
+.cart > div:hover .trash a  {
+	color: var(--link-color-default);
+}
+
+.cart .summary {
+	font-weight: 600;
+	font-size: 1.13rem;
+}
+
+
+/******************************************************************************/
+.qtyctrl {
+	display: grid;
+	grid-auto-flow: column;
+	line-height: 1.6rem;
+	border: 1px solid #E6EAED;
+	padding: 2px;
+	border-radius: 4px;
+	min-width: 4rem;
+	max-width: 5.33rem;
+}
+.qtyctrl>div{
+	font-size: 1.2rem;
+	font-weight: 400;
+	padding-left: 0.4rem;
+	padding-right: 0.4rem;
+	color: #afafaf;
+	cursor: pointer;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.qtyctrl>div:first-child {
+	border-bottom-left-radius: 4px;
+	border-top-left-radius: 4px;
+}
+
+.qtyctrl>div:last-child {
+	border-bottom-right-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.qtyctrl>div:hover{
+	background-color: #E6EAED;
+}
+
+.qtyctrl input {
+	width: 100%;
+	max-width: 100%;
+	text-align: center;
+	box-sizing: border-box;
+	font-size: 1rem;
+	border: none;
+	padding-right: 0.4rem;
+	background-color: transparent;
+}
+/******************************************************************************/
+
+@media (max-width: 1200px) {
+	#checkoutpage {
+		grid-template-columns: 1fr;
+		grid-template-areas: "cartapp";
+	}
+	#sidebar {
+		display: none;
+	}
+	#cartapp {
+		padding-right: 0;
+	}
+}
+
+@media (max-width: 576px) {
+	.cart > div {
+		grid-template-areas: 
+			"pic product product"
+            "pic amount amount"
+            "price qty trash";
+		grid-template-columns: 1fr 2fr auto;
+		gap: 0.8rem;
+	}
+    .cart .price {
+		text-align: center !important;
+    }
+    .cart .trash {
+		text-align: right !important;
+    }
+    .cart .amount {
+		/*text-align: center !important;*/
+		font-weight: 600;
+    }
+	.cart > div.delivery {
+		grid-template-areas: 
+			"product amount";
+		grid-template-columns: 1fr 1fr;
+	}
+	.cart > div.delivery .pic,
+	.cart > div.delivery .price,
+	.cart > div.delivery .qty,
+	.cart > div.delivery .trash  {
+		display: none;
+    }
+    .cart .summary {
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		width: 60%;
+		grid-template-areas: 
+			"qty amount";
+		grid-template-columns: auto 1fr;
+		background-color: white;
+		box-shadow: 0 0 5px rgb(136 145 157 / 10%);
+		padding-left: 0.58em;
+	}
+	.cart > .summary .pic,
+	.cart > .summary .product,
+	.cart > .summary .price,
+	.cart > .summary .trash  {
+		display: none;
+    }
+	.cart > .summary .amount  {
+		text-align: left;
+    }
+}

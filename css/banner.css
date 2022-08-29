@@ -1,0 +1,64 @@
+.banners {
+	background: #176EAE;
+	box-sizing: border-box;
+	max-height: 370px;
+	height: 370px;
+	overflow-y: hidden;
+	background-image: url('/theme/img/banner/banner-bg-left.jpg'), url('/theme/img/banner/banner-bg-right.jpg');
+	background-position: left top, right top;
+	background-repeat: no-repeat, no-repeat;
+	color: white;
+	padding-top: 1.5rem;
+	padding-bottom: 1.5rem;
+}
+
+.banners > *  {
+	height: 100%;
+	max-height: 100%;
+}
+
+.banners a  {
+	display: grid;
+	height: 100%;
+	max-height: 100%;
+	min-width: 0;
+	/*grid-template-columns: auto auto;*/
+	/*justify-content: center;*/
+	grid-auto-flow: column;
+	text-decoration: none;
+}
+
+.banners a img  {
+	display: block;
+	height: 100%;
+	max-height: 100%;
+	margin: auto;
+}
+
+
+.banners h5 {
+	font-weight: bold;
+	font-size: 2.1rem;
+	margin-bottom: 2rem;
+	color: white;
+}
+
+.banners .strong {
+	font-size: 1.28rem;
+}
+
+@media screen and (max-width: 750px) {
+	.banners h5 {
+		font-size: 1.3rem;
+		margin-bottom: 1rem;
+	}
+	.banners .strong {
+		font-size: 0.95rem;
+	}
+}
+
+@media (max-width: 652px) {
+	.banners {
+		background-image: url('/theme/img/banner/banner-bg-left.jpg');
+	}
+}

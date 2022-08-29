@@ -1,0 +1,132 @@
+@charset "UTF-8";
+
+header {
+	background-color: var(--header-background-color);
+	box-shadow: var(--header-shadow);
+}
+
+.appbar {
+	display: flex;
+	gap: 1em;
+	padding: var(--appbar-padding);
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.appbar-shadow {
+	box-shadow: var(--appbar-shadow);
+}
+
+.appbar a {
+	text-decoration: none;
+}
+
+.appbar > * {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.appbar .logo {
+	font-size: var(--appbar-logo-size);
+	color: var(--appbar-logo-color);
+	background-color: var(--appbar-logo-background-color);
+	height: 100%;
+	padding: 0.1em 0.15em 0.1em 0.1em;
+}
+
+.appbar .title {
+	flex-grow: 1;
+}
+
+.appbar .title .caption {
+	font: var(--appbar-title-font);
+	color: var(--appbar-title-color);
+}
+
+.appbar .title .subcaption {
+	color: #88919D;
+	font-size: 0.8em;
+}
+
+.appbar .phone {
+	font-weight: bold;
+	font-size: 1.1em;
+	padding-right: 1em;
+}
+
+.appbar .schedule {
+	font-size: 0.9em;
+	margin-right: 1em;
+}
+
+.appbar .schedule .dow {
+	display: flex;
+	flex-direction: row;
+	gap: 2px;
+	margin-bottom: 3px;
+}
+
+.appbar .schedule .dow > * {
+	height: 2px;
+	background-color: var(--appbar-schedule-workday-color);
+	flex-grow: 1;
+}
+
+.appbar .schedule .dow > *:nth-last-child(-n+2) {
+	background-color: var(--appbar-schedule-weekend-color);
+}
+
+.appbar .schedule .workday {
+	color: var(--appbar-schedule-workday-color);
+}
+
+.appbar .schedule .weekend {
+	color: var(--appbar-schedule-weekend-color);
+}
+
+.appbar .icon {
+	font-size: var(--appbar-icon-size);
+	color: var(--appbar-icon-color);
+}
+
+@media (max-width: 576px) {
+	.appbar {
+		position: fixed;
+		z-index: 998;
+		font-size: var(--appbar-mobile-font-size);
+		background-color: var(--appbar-mobile-background-color);
+		box-shadow: var(--appbar-mobile-shadow);
+		width: 100%;
+		left: 0;
+		top: 0;
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+	}
+    .appbar > *:nth-child(n+3) {
+		display: none;
+	}
+	.appbar .title .caption {
+		font: var(--appbar-mobile-title-font);
+	}
+	.appbar .title .subcaption {
+		font-size: 1em;
+	}
+}
+
+.appbar .icon.counter {
+	position: relative;
+}
+
+.appbar .icon.counter sup {
+	background: red;
+	right: 0;
+	top: 0.2em;
+	position: absolute;
+	color: white;
+	display: block;
+	font-size: 0.5em;
+	font-weight: 600;
+	padding: 0 0.2rem 0 0.2rem;
+	border-radius: 5px;
+}
