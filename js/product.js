@@ -4,6 +4,9 @@ $(document).ready(function() {
   $('.tabs a').on('click', onTabClick);
   $('.tabs>.active>a').click();
 
+  $('#detailed-descr').on('click', onDetailDescrClick);
+  $('#detailed-chars').on('click', onDetailCharsClick);
+
   window.swiper = new Swipe(document.querySelector('#slider'), { speed: 200, callback: onSwipe});
 
   $('.product .gallery > a').on('click', onGalleryItemClick)
@@ -13,6 +16,28 @@ $(document).ready(function() {
   loadDeliveryJSON();
   ymaps.ready(getGeo);
 
+
+/*
+  citySelector = new autoComplete({
+            placeHolder: "Search for Food...",
+            data: {
+                src: ["Sauce - Thousand Island", "Wild Boar - Tenderloin", "Goat - Whole Cut"],
+                cache: true,
+            },
+            resultItem: {
+                highlight: true
+            },
+            events: {
+                input: {
+                    selection: (event) => {
+                        const selection = event.detail.selection.value;
+                        citySelector.input.value = selection;
+                    }
+                }
+            }
+
+  });
+*/
 });
 
 //////////////////////////////////////////////
@@ -30,6 +55,20 @@ function onTabClick(event) {
   $(event.target).parents('li').addClass('active');
   var page = $(event.target).parents('li').attr('page');
   $('.pages > #'+page).show();
+}
+
+function onDetailDescrClick() {
+  $('.tabs > li').removeClass('active')
+  $(".tabs > li[page='page_details']").addClass('active')
+  $('.pages > *').hide();
+  $('.pages > #page_details').show();
+}
+
+function onDetailCharsClick(e) {
+  $('.tabs > li').removeClass('active')
+  $(".tabs > li[page='page_char']").addClass('active')
+  $('.pages > *').hide();
+  $('.pages > #page_char').show();
 }
 
 //////////////////////////////////////////////
@@ -68,9 +107,10 @@ function getGeo() {
   )
 */
   .then(function(result) {
-    //var coord = result.geoObjects.position;
     var coord = result.geoObjects.get(0).geometry.getCoordinates();
     var addr = result.geoObjects.get(0).properties.get('text');
+    latitude = coord[0];
+    longitude = coord[1];
     getCity(coord[0], coord[1]);
     getDelivery(coord[0], coord[1], addr);
   }, function(err) {
@@ -102,7 +142,7 @@ function setPickups(data) {
     $('#city-spinner').hide();
     $('#city').text(data.city).css('display', 'inline');
     $('#pickup-spinner').hide();
-    $('#pickups').text(data.pickups + ' ' + num_word(data.pickups, ['пункт', 'пункта', 'пунктов']));
+    $('#pickup-points').text(data.pickups + ' ' + num_word(data.pickups, ['пункт', 'пункта', 'пунктов']));
     switch (data.term) {
       case 0:
         term = 'Сегодня';
@@ -118,6 +158,7 @@ function setPickups(data) {
     pickup_price = (data.price > 0) ? '<b>' + data.price + '</b>&nbsp;&#8381' : '<b>Бесплатно</b>';
     $('#pickup_price').html(pickup_price);
     $('#pickup').show();
+    PICKUP_PRICE = data.price;
   }
 }
 

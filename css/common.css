@@ -144,17 +144,49 @@ ul.toc li:not(.normal) span:last-child {
 	text-decoration: none;
 	display: block;
 	font-weight: 700;
-	font-size: 0.96em;
+	font-size: 1em;
 	text-transform: uppercase;
 	text-align: center;
 	padding-top: 0.7em;
 	padding-bottom: 0.6em;
+	border: none;
+	width: 100%;
 }
 
 .btn.yellow {
 	background-color: #fdce1b;
 	color: #000000;
 }
+
+.btn-group > * {
+	padding: var(--input-padding);
+	margin-left: -1px;
+	border-color: var(--borders-color);
+	border-width: 1px;
+	border-style: solid;
+	padding-left: 1.5em;
+	padding-right: 1.5em;
+}
+
+.btn-group > *:first-child {
+	border-top-left-radius: var(--input-border-radius);
+	border-bottom-left-radius: var(--input-border-radius);
+}
+
+.btn-group > *:last-child {
+	border-top-right-radius: var(--input-border-radius);
+	border-bottom-right-radius: var(--input-border-radius);
+}
+
+.btn-group > *.active {
+	border-color: #fdce1b;
+	background-color: #fdce1b30;
+}
+
+.btn-group > *.active + * {
+	border-left: none;
+}
+
 
 ul.tabs {
 	list-style-type: none;
@@ -197,6 +229,14 @@ ul.tabs li a:hover {
 	color: #0a2c4b;
 }
 
-input {
+input[type=text] {
 	outline: none;
+	font: var(--font-default);
+	padding: var(--input-padding);
+	width: 100%;
+	border-color: var(--borders-color);
+	border-width: 1px;
+	border-style: solid;
+	border-radius: var(--input-border-radius);
+	box-sizing: border-box;
 }

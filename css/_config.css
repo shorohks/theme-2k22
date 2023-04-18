@@ -4,6 +4,10 @@
 	--font-default: 15px/1.15 "Roboto", "Arial", sans-serif;
 	--color-default: #001a34;
 	--link-color-default: #0d6efd;
+	--borders-color: #e6e6e6;
+
+	--input-padding: 0.6em 0.6em 0.6em 0.6em;
+	--input-border-radius: 5px;
 
 	--header-background-color: white;
 	--header-shadow: 0 5px 5px rgb(136 145 157 / 10%), 0 1px 0 #e6eaed;

@@ -1,5 +1,9 @@
 @charset "UTF-8";
 
+h2 {
+	color: #444444;
+}
+
 #checkoutpage {
 	display: grid;
 	grid-template-columns: 2.8fr 1fr;
@@ -191,6 +195,21 @@
 	border: none;
 	padding-right: 0.4rem;
 	background-color: transparent;
+}
+
+.form-row {
+	display: grid;
+	grid-template-columns: 0.2fr 1fr;
+	margin-bottom: 1em;
+}
+
+.form-row>* {
+	display: flex;
+	align-items: center;
+}
+
+.controls {
+	margin-top: 2em;
 }
 /******************************************************************************/
 

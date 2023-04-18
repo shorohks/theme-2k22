@@ -12,8 +12,11 @@
   <script src="/theme/js/lib/swipe/swipe.js" type="text/javascript"></script>
   <script src="/theme/js/lib/fancybox/fancybox.umd.js" type="text/javascript"></script>
   <link href="/theme/js/lib/fancybox/fancybox.css" rel="stylesheet" media="all" />
+  <script src="/theme/js/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script>
+  <link href="/theme/js/lib/autocomplete/autocomplete.min.css" rel="stylesheet" media="all" />
   <script src="/theme/js/product.js" type="text/javascript"></script>
   <script src="/theme/js/map-calculator.js" type="text/javascript"></script>
+  <script src="http://cdn.yadc-js.ru/yadc.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
   <TMPL_INCLUDE FILE="_header.tmpl">
@@ -62,14 +65,14 @@
       </div>
       <div class="controls">
         <div class="brief_desc">
-          <TMPL_VAR NAME="description">. <a href="/" class="dotted">Подробнее...</a>
+          <TMPL_VAR NAME="description">. <a href="#pages" id="detailed-descr" class="dotted">Подробнее...</a>
         </div>
         <div class="brief_sheet">
           <ul class="toc">
           <TMPL_LOOP NAME='characteristics'>
             <li><span><TMPL_VAR NAME='name'></span> <span><TMPL_VAR NAME='value'></span></li>
           </TMPL_LOOP>
-            <li class="normal"><a href="/" class="dotted">Все характеристики</a></li>
+            <li class="normal"><a href="#pages" id="detailed-chars" class="dotted">Все характеристики</a></li>
           </ul>
         </div>
         <div class="price-and-buy">
@@ -82,11 +85,12 @@
         </div>       
         <div class="city">
           Ваш город: <i class="powericon-spinner powericon-pulse" id="city-spinner"></i> <a href="#" class="dotted" id="city"></a>
+          <!-- <input id="autoComplete" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off"> -->
         </div>
         <div class="delivery">
           <div>
             <div>В пунктах выдачи:</div>
-            <div><i class="powericon-spinner powericon-pulse" id="pickup-spinner"></i> <div id="pickup"><span id="pickup_term"></span> - <span id="pickup_price"></span> (<a href="#" id="pickups" class="dotted"></a>)</div></div>
+            <div><i class="powericon-spinner powericon-pulse" id="pickup-spinner"></i> <div id="pickup"><span id="pickup_term"></span> - <span id="pickup_price"></span> (<a href="#pickups" id="pickup-points" class="dotted"></a>)</div></div>
             <!-- <div>Оплата при получении</div> -->
           </div>
           <div>
@@ -103,6 +107,7 @@
         <li page="page_details" class="active"><a href="#">Описание</a></li>
         <li page="page_char"><a href="#">Характеристики</a></li>
         <li page="page_reviews"><a href="#">Отзывы&nbsp;<span>0</span></a></li>
+        <a id="pages" name="pages"></a>
       </ul>
 
       <div class="pages">
@@ -123,6 +128,7 @@
   <script type="text/javascript">
     product_price = <TMPL_VAR NAME="price">;
     cargo = {
+      id: "<TMPL_VAR NAME="code">",
       count: 1,
       <TMPL_IF NAME="price">price: <TMPL_VAR NAME="price">,</TMPL_IF>
       <TMPL_IF NAME="weight">weight: <TMPL_VAR NAME="weight">,</TMPL_IF>
@@ -132,6 +138,8 @@
     DELIVERY_FREE_LIMIT = <TMPL_VAR NAME="DELIVERY_FREE_LIMIT">;
     DELIVERY_EXTRA_PAY = <TMPL_VAR NAME="DELIVERY_EXTRA_PAY">;
   </script>
+
+  <TMPL_INCLUDE FILE="_pickups.tmpl">
 
 </body>
 </html>
