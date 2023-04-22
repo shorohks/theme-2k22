@@ -82,6 +82,8 @@ h2 {
 
 .cart .pic img {
 	max-width: 100%;
+	mix-blend-mode: multiply;
+	filter: contrast(1);
 }
 
 .cart .product {
@@ -147,55 +149,6 @@ h2 {
 
 
 /******************************************************************************/
-.qtyctrl {
-	display: grid;
-	grid-auto-flow: column;
-	line-height: 1.6rem;
-	border: 1px solid #E6EAED;
-	padding: 2px;
-	border-radius: 4px;
-	min-width: 4rem;
-	max-width: 5.33rem;
-}
-.qtyctrl>div{
-	font-size: 1.2rem;
-	font-weight: 400;
-	padding-left: 0.4rem;
-	padding-right: 0.4rem;
-	color: #afafaf;
-	cursor: pointer;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-
-.qtyctrl>div:first-child {
-	border-bottom-left-radius: 4px;
-	border-top-left-radius: 4px;
-}
-
-.qtyctrl>div:last-child {
-	border-bottom-right-radius: 4px;
-	border-top-right-radius: 4px;
-}
-
-.qtyctrl>div:hover{
-	background-color: #E6EAED;
-}
-
-.qtyctrl input {
-	width: 100%;
-	max-width: 100%;
-	text-align: center;
-	box-sizing: border-box;
-	font-size: 1rem;
-	border: none;
-	padding-right: 0.4rem;
-	background-color: transparent;
-}
 
 .form-row {
 	display: grid;

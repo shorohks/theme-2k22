@@ -8,8 +8,10 @@
   <link rel="stylesheet" href="/theme/css/cart.css" media="all" />
   <script src="https://api-maps.yandex.ru/2.1/?apikey=1d361db1-2796-4a44-80ea-487b93817c0a&lang=ru_RU" type="text/javascript"></script>
   <script src="/theme/js/lib/jquery/jquery.min.js" type="text/javascript"></script>
+  <script src="/theme/js/lib/vue/vue.js" type="text/javascript"></script>
   <script src="/theme/js/cart.js" type="text/javascript"></script>
   <script src="/theme/js/map-calculator.js" type="text/javascript"></script>
+  <script src="/theme/js/lib/vue-input-numeric/vue-input-numeric.min.js" type="text/javascript"></script>
 </head>
 <body>
   <TMPL_INCLUDE FILE="_header.tmpl">
@@ -19,86 +21,7 @@
     <h1>Оформление заказа</h1>
 
     <div id="checkoutpage">
-      <div id="cartapp">
-
-        <div class="cart">
-          <TMPL_LOOP NAME="products">
-          <div>
-            <div class="pic">
-              <TMPL_IF NAME="image_big">
-                <a href="product.php?product=<TMPL_VAR NAME='code'>">
-                  <img src="products/img/<TMPL_VAR NAME='image_big'>" />
-                </a>
-              </TMPL_IF>
-            </div>
-            <div class="product">
-              <a href="product.php?product=<TMPL_VAR NAME='code'>">
-                <span><TMPL_VAR NAME='category'></span>
-                <TMPL_VAR NAME='trademark'> <TMPL_VAR NAME='model'>
-              </a>
-            </div>
-            <div class="price">
-              <TMPL_VAR NAME='fprice'>&nbsp;&#8381;
-            </div>
-            <div class="qty">
-              <div class="qtyctrl">
-                <div>&minus;</div>
-                <input value="<TMPL_VAR NAME='quantity'>">
-                <div>+</div>
-              </div>
-            </div>
-            <div class="amount">
-              <TMPL_VAR NAME='fprice'>&nbsp;&#8381;
-            </div>
-            <div class="trash">
-              <a href="/remove.php?product=<TMPL_VAR NAME='code'>"><i class="powericon-trash"></i></a>
-            </div>
-          </div>
-          </TMPL_LOOP>
-
-          <div class="delivery">
-            <div class="pic"></div>
-            <div class="product">
-              <span>Доставка</span>
-              В пункт выдачи
-              <a href="#" class="address">Выберите пункт выдачи&nbsp;<i class="powericon-exclamation_sign"></i></a>
-            </div>
-            <div class="price"></div>
-            <div class="qty"></div>
-            <div class="amount">Бесплатно</div>
-            <div class="trash"></div>
-          </div>
-
-          <div class="summary">
-            <div class="pic"></div>
-            <div class="product"></div>
-            <div class="price"></div>
-            <div class="qty">Итого:</div>
-            <div class="amount">500&nbsp;&#8381;</div>
-            <div class="trash"></div>
-          </div>
-
-        </div>
-
-        <!-- <h2>Получение</h2> -->
-        <div class="form">
-          <div class="form-row">
-            <label>Получение</label>
-            <div class="btn-group">
-              <div class="active">Доставка</div>
-              <div>Пункт выдачи</div>
-            </div>
-          </div>
-          <div class="form-row">
-            <label>Получатель</label>
-            <input type="text">
-          </div>
-          <div class="controls">
-            <input type="submit" value="Подтвердить заказ" class="btn yellow">
-          </div>
-        </div>
-      
-      </div>
+      <div id="cartapp"></div>
       <div id="sidebar">
         <div>
           <i class="icon powericon-shield"></i>
@@ -119,6 +42,95 @@
     </div>
 
   </div>
+
+  <script type="text/javascript">
+    CART = [
+      <TMPL_LOOP NAME="products">
+        {
+           code: "<TMPL_VAR NAME='code'>",
+           quantity: <TMPL_VAR NAME='quantity'>,
+           category: "<TMPL_VAR NAME='category'>",
+           trademark: "<TMPL_VAR NAME='trademark'>",
+           model: "<TMPL_VAR NAME='model'>",
+           price: <TMPL_VAR NAME='price'>,
+           image_big: "<TMPL_VAR NAME='image_big'>",
+        },
+      </TMPL_LOOP>
+    ];
+  </script>
+
+  <script type="x-template" id="cartapp-template">
+    <div id="cartapp">
+      <div class="cart">
+
+        <div v-for="(product, index) in products" :key="product.code" >
+          <div class="pic">
+              <a v-bind:href="'product.php?product=' + product.code" v-if="product.image_big">
+                <img v-bind:src="'products/img/' + product.image_big" />
+              </a>
+          </div>
+          <div class="product">
+            <a v-bind:href="'product.php?product=' + product.code">
+              <span>{{product.category}}</span>
+              {{product.trademark}} {{product.model}}
+            </a>
+          </div>
+          <div class="price">
+            {{product.price|currency}}&nbsp;&#8381;
+          </div>
+          <div class="qty">
+            <vue-input-numeric v-model="product.quantity" v-on:input="onProductQuantityChange(product)"/>
+          </div>
+          <div class="amount">
+            {{getProductSum(product)|currency}}&nbsp;&#8381;
+          </div>
+          <div class="trash">
+            <a v-on:click.prevent="onDeleteProductClick(product)" v-bind:href="'/remove.php?product=' + product.code"><i class="powericon-trash"></i></a>
+          </div>
+        </div>
+
+        <div class="delivery">
+          <div class="pic"></div>
+          <div class="product">
+            <span>Доставка в пункт выдачи</span>
+            <a href="#" class="address">Выберите пункт выдачи&nbsp;<i class="powericon-exclamation_sign"></i></a>
+          </div>
+          <div class="price"></div>
+          <div class="qty"></div>
+          <div class="amount">Бесплатно</div>
+          <div class="trash"></div>
+        </div>
+
+        <div class="summary">
+          <div class="pic"></div>
+          <div class="product"></div>
+          <div class="price"></div>
+          <div class="qty">Итого:</div>
+          <div class="amount">{{totalCost|currency}}&nbsp;&#8381;</div>
+          <div class="trash"></div>
+        </div>
+      </div>
+
+      <!-- <h2>Получение</h2> -->
+      <div class="form">
+        <div class="form-row">
+          <label>Получение</label>
+          <div class="btn-group">
+            <div class="active">Доставка</div>
+            <div>Пункт выдачи</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Получатель</label>
+          <input type="text">
+        </div>
+        <div class="controls">
+          <input type="submit" value="Подтвердить заказ" class="btn yellow">
+        </div>
+      </div>
+
+    </div>
+  </script>
 
   <TMPL_INCLUDE FILE="_footer.tmpl">
 </body>
