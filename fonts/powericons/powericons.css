@@ -34,6 +34,9 @@
 .powericon-spinner:before {
   content: "\f110";
 }
+.powericon-calc:before {
+  content: "\f1ec";
+}
 .powericon-menu:before {
   content: "\e902";
 }

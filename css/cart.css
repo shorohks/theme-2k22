@@ -150,19 +150,36 @@ h2 {
 
 /******************************************************************************/
 
+#cartapp .form {
+	margin-top: 3rem;
+}
+
+label {
+	color: var(--label-color);
+}
+
 .form-row {
 	display: grid;
-	grid-template-columns: 0.2fr 1fr;
+	grid-template-columns: 0.15fr 1fr;
 	margin-bottom: 1em;
 }
 
-.form-row>* {
+.form-row.col-2 {
+	grid-template-columns: 0.15fr 0.4fr 0.2fr 0.4fr;
+}
+
+.form-row > * {
 	display: flex;
 	align-items: center;
 }
 
+.form-row > *:nth-child(3) {
+	justify-content: flex-end;
+	padding-right: 1rem;
+}
+
 .controls {
-	margin-top: 2em;
+	margin-top: 3em;
 }
 /******************************************************************************/
 
@@ -230,4 +247,34 @@ h2 {
 	.cart > .summary .amount  {
 		text-align: left;
     }
+}
+
+@media (max-width: 992px) {
+	.form-row {
+		grid-template-columns: 0.2fr 1fr;
+	}
+	.form-row.col-2 {
+		grid-template-columns: 0.2fr 1fr;
+		row-gap: 1em;
+	}
+	.form-row > *:nth-child(3) {
+		justify-content: flex-start;
+		padding-right: 0;
+	}
+}
+
+@media (max-width: 768px) {
+	.form-row, .form-row.col-2 {
+		grid-template-columns: 0.3fr 1fr;
+	}
+}
+
+@media (max-width: 576px) {
+	.form-row, .form-row.col-2 {
+		grid-template-columns: 1fr;
+		row-gap: 0.4em;
+	}
+	.form-row.col-2 > *:nth-child(2) {
+		margin-bottom: 1em;
+	}
 }

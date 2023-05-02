@@ -225,14 +225,3 @@ function num_word(value, words) {
 */
 }
 
-//////////////////////////////////////////////
-function loadDeliveryJSON() {
-  $.ajax({
-    url: '/products/delivery.json',
-    dataType: 'json',
-  }).done(function(data) {
-    window.delivery_details = data;
-  }).fail(function(jqXHR, textStatus, errorThrown){
-    console.log(errorThrown);
-  });
-}

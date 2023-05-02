@@ -164,8 +164,16 @@ ul.toc li:not(.normal) span:last-child {
 	border-color: var(--borders-color);
 	border-width: 1px;
 	border-style: solid;
-	padding-left: 1.5em;
-	padding-right: 1.5em;
+	padding-left: 1em;
+	padding-right: 1em;
+
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
 
 .btn-group > *:first-child {
@@ -184,7 +192,35 @@ ul.toc li:not(.normal) span:last-child {
 }
 
 .btn-group > *.active + * {
-	border-left: none;
+	border-left-color: transparent;
+}
+
+.btn-group > *:not(.active) {
+	cursor: pointer;
+}
+
+.btn-group > *.disabled {
+	/*background-color: #f9f9f9;*/
+    box-shadow: inset 0px 0px 40px rgba(0,0,0,0.05);
+	color: #d0d0d0;
+}
+
+.input-btn {
+	gap: 0.5rem;
+}
+
+.input-btn > *:first-child {
+	flex-grow: 1;
+}
+
+.input-btn > *:last-child {
+	padding: var(--input-padding);
+	border-color: #fdce1b;
+	background-color: #fdce1b30;
+	border-width: 1px;
+	border-style: solid;
+	border-radius: var(--input-border-radius);
+	cursor: pointer;
 }
 
 
@@ -229,7 +265,7 @@ ul.tabs li a:hover {
 	color: #0a2c4b;
 }
 
-input[type=text] {
+input[type=text], textarea {
 	outline: none;
 	font: var(--font-default);
 	padding: var(--input-padding);
@@ -239,4 +275,17 @@ input[type=text] {
 	border-style: solid;
 	border-radius: var(--input-border-radius);
 	box-sizing: border-box;
+}
+
+::placeholder {
+  color: #d0d0d0;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+ color: #d0d0d0;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+ color: #d0d0d0;
 }

@@ -6,12 +6,14 @@
   <meta name="keywords" content="" />
   <TMPL_INCLUDE FILE="_meta.tmpl">
   <link rel="stylesheet" href="/theme/css/cart.css" media="all" />
-  <script src="https://api-maps.yandex.ru/2.1/?apikey=1d361db1-2796-4a44-80ea-487b93817c0a&lang=ru_RU" type="text/javascript"></script>
+  <script src="//api-maps.yandex.ru/2.1/?apikey=1d361db1-2796-4a44-80ea-487b93817c0a&lang=ru_RU" type="text/javascript"></script>
   <script src="/theme/js/lib/jquery/jquery.min.js" type="text/javascript"></script>
   <script src="/theme/js/lib/vue/vue.js" type="text/javascript"></script>
   <script src="/theme/js/cart.js" type="text/javascript"></script>
   <script src="/theme/js/map-calculator.js" type="text/javascript"></script>
   <script src="/theme/js/lib/vue-input-numeric/vue-input-numeric.min.js" type="text/javascript"></script>
+  <script src="/theme/js/lib/vue-input-address/vue-input-address.min.js" type="text/javascript"></script>
+  <script src="//cdn.yadc-js.ru/yadc.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
   <TMPL_INCLUDE FILE="_header.tmpl">
@@ -92,8 +94,11 @@
         <div class="delivery">
           <div class="pic"></div>
           <div class="product">
-            <span>Доставка в пункт выдачи</span>
-            <a href="#" class="address">Выберите пункт выдачи&nbsp;<i class="powericon-exclamation_sign"></i></a>
+            <span v-if="delivery == DELIVERY_COURIER">Доставка по адресу</span>
+            <span v-if="delivery == DELIVERY_PICKUP">Доставка в пункт выдачи</span>
+            <a v-if="delivery == DELIVERY_PICKUP" href="#" class="address">Выберите пункт выдачи&nbsp;<i class="powericon-exclamation_sign"></i></a>
+            <a v-if="delivery == DELIVERY_COURIER && !address" href="#" class="address">Укажите адрес доставки&nbsp;<i class="powericon-exclamation_sign"></i></a>
+            <a v-if="delivery == DELIVERY_COURIER && address" href="#" class="address">{{address}}</a>
           </div>
           <div class="price"></div>
           <div class="qty"></div>
@@ -116,13 +121,78 @@
         <div class="form-row">
           <label>Получение</label>
           <div class="btn-group">
-            <div class="active">Доставка</div>
-            <div>Пункт выдачи</div>
+            <div v-bind:class="{active: delivery == DELIVERY_COURIER}" v-on:click="delivery = DELIVERY_COURIER">Доставка</div>
+            <div v-bind:class="{active: delivery == DELIVERY_PICKUP}" v-on:click="delivery = DELIVERY_PICKUP">Пункт выдачи</div>
           </div>
+        </div>
+        <div v-if="delivery == DELIVERY_COURIER" class="form-row">
+          <label>Адрес</label>
+          <div class="input-btn">
+            <vue-input-address v-model="address"/>
+            <div v-on:click="calcDelivery"><i class="powericon-calc"></i></div>
+          </div>
+        </div>
+        <div v-if="delivery == DELIVERY_PICKUP" class="form-row">
+          <label>Пункт выдачи</label>
+          <div><a v-on:click.prevent="onChoosePickupClick" href="#pickups" class="dotted" style="margin: 0.64em 0">Выберите пункт выдачи</a>&nbsp;<sup><i class="powericon-exclamation_sign"></i></sup></div>
         </div>
         <div class="form-row">
           <label>Получатель</label>
           <input type="text">
+        </div>
+        <div v-if="payer == PAYER_INDIVIDUAL && pay == PAY_BILL" class="form-row">
+          <label>Прописка</label>
+          <input type="text">
+        </div>
+        <div class="form-row col-2">
+          <label>Телефон</label>
+          <input type="text">
+          <label>e-mail</label>
+          <input v-if="pay == PAY_BILL" type="text">
+          <input v-else placeholder="(Необязательно)" type="text">
+        </div>
+        <div class="form-row col-2">
+          <label>Оплата</label>
+          <div class="btn-group">
+            <div v-bind:class="{active: pay == PAY_CASH}" v-on:click="pay = PAY_CASH">Наличные</div>
+            <div v-bind:class="{active: pay == PAY_CARD}" v-on:click="pay = PAY_CARD">Карта</div>
+            <div v-bind:class="{active: pay == PAY_BILL}" v-on:click="pay = PAY_BILL">Счёт</div>
+          </div>
+          <label>Плательщик</label>
+          <div class="btn-group">
+            <div v-bind:class="{active: payer == PAYER_INDIVIDUAL}" v-on:click="payer = PAYER_INDIVIDUAL">Физ.лицо</div>
+            <div v-bind:class="{active: payer == PAYER_LEGAL}" v-on:click="payer = PAYER_LEGAL">Юр.лицо</div>
+          </div>
+        </div>
+        <div v-if="payer == PAYER_LEGAL" class="form-row">
+          <label>Плательщик</label>
+          <input type="text">
+        </div>
+        <div v-if="payer == PAYER_LEGAL" class="form-row">
+          <label>Юр.адрес</label>
+          <input type="text">
+        </div>
+        <div v-if="payer == PAYER_LEGAL" class="form-row col-2">
+          <label>ИНН</label>
+          <input type="text">
+          <label>КПП</label>
+          <input type="text">
+        </div>
+        <div v-if="payer == PAYER_LEGAL" class="form-row col-2">
+          <label>Р/сч</label>
+          <input type="text">
+          <label>Корр/сч</label>
+          <input type="text">
+        </div>
+        <div v-if="payer == PAYER_LEGAL" class="form-row col-2">
+          <label>Банк</label>
+          <input type="text">
+          <label>БИК</label>
+          <input type="text">
+        </div>
+        <div class="form-row">
+          <label>Комментарии</label>
+          <textarea rows="3"></textarea>
         </div>
         <div class="controls">
           <input type="submit" value="Подтвердить заказ" class="btn yellow">
@@ -133,5 +203,6 @@
   </script>
 
   <TMPL_INCLUDE FILE="_footer.tmpl">
+  <TMPL_INCLUDE FILE="_pickups.tmpl">
 </body>
 </html>

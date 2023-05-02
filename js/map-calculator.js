@@ -1,3 +1,16 @@
+//////////////////////////////////////////////
+function loadDeliveryJSON() {
+  $.ajax({
+    url: '/products/delivery.json',
+    dataType: 'json',
+  }).done(function(data) {
+    window.delivery_details = data;
+  }).fail(function(jqXHR, textStatus, errorThrown){
+    console.log(errorThrown);
+  });
+}
+
+//////////////////////////////////////////////
 function calcSuburbDistance(userCoord, cityCenterCoord, cityArea, callback) {
     // Скрытые слои для карты
     $('body').append('<div style="display: none;"><div id="calcSuburbDistance" style="height: 600px; width: 600px;"></div></div>');

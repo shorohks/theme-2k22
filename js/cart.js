@@ -1,17 +1,32 @@
 $(function() {
 
+loadDeliveryJSON();
+
 auth = new Vue({
   data: {
+    DELIVERY_COURIER: 0,
+    DELIVERY_PICKUP: 2,
+    PAYER_INDIVIDUAL: 1,
+    PAYER_LEGAL: 2,
+    PAY_CASH: 1,
+    PAY_BILL: 2,
+    PAY_CARD: 3,
     products: CART,
+    delivery: 0,
+    payer: 1,
+    pay: 1,
+    address: undefined,
   },
   methods: {
     getProductSum: getProductSum,
     getProductsCount: getProductsCount,
     onDeleteProductClick: onDeleteProductClick,
     onProductQuantityChange: onProductQuantityChange,
+    onChoosePickupClick: onChoosePickupClick,
     ajaxDeleteProduct: ajaxDeleteProduct,
     ajaxUpdateCart: ajaxUpdateCart,
     updateCounterIcon: updateCounterIcon,
+    calcDelivery: calcDelivery,
   },
   computed: {
     totalCost: getTotalCost,
@@ -19,7 +34,10 @@ auth = new Vue({
   filters: {
     currency: formatPrice,
   },
-  watch: {},
+  watch: {
+    payer: onPayerChange,
+    pay: onPayChange,
+  },
   components: {},
   mounted: function() {},
   created: function() {},
@@ -108,6 +126,41 @@ function formatPrice(amount) {
 /////////////////////////////////////////////////////////////
 function formatPriceCustom(amount, denomination) {
   return (amount !== null) ? parseFloat(amount).toFixed(denomination).replace(/(\d)(?=(\d{3})+(\.|$))/g, '$1 ') : '';
+}
+
+/////////////////////////////////////////////////////////////
+function onChoosePickupClick(){
+  window.history.pushState({}, '', '#pickups');
+  showPickups();
+}
+
+/////////////////////////////////////////////////////////////
+function onPayerChange(newVal, oldVal){
+  if (newVal == this.PAYER_LEGAL)
+    this.pay = this.PAY_BILL;
+}
+
+/////////////////////////////////////////////////////////////
+function onPayChange(newVal, oldVal){
+  if (newVal == this.PAY_CASH || newVal == this.PAY_CARD)
+    this.payer = this.PAYER_INDIVIDUAL;
+}
+
+/////////////////////////////////////////////////////////////
+function calcDelivery() {
+var myGeocoder = ymaps.geocode(this.address);
+myGeocoder.then(
+    function (res) {
+        //map.geoObjects.add(res.geoObjects);
+        // Выведем в консоль данные, полученные в результате геокодирования объекта.
+        console.log(res.geoObjects.get(0));
+        console.log(res.geoObjects.get(0).properties.get('metaDataProperty').getAll());
+    },
+    function (err) {
+        // Обработка ошибки
+        console.log(err);
+    }
+);
 }
 
 });
