@@ -16,6 +16,10 @@ auth = new Vue({
     payer: 1,
     pay: 1,
     address: undefined,
+    distance: 0,
+    idm: undefined,
+    calculating: false,
+    delivery_location: undefined,		// 0/1/2 - нет доставки/по городу/за город
   },
   methods: {
     getProductSum: getProductSum,
@@ -27,9 +31,17 @@ auth = new Vue({
     ajaxUpdateCart: ajaxUpdateCart,
     updateCounterIcon: updateCounterIcon,
     calcDelivery: calcDelivery,
+    showDeliveryMap: showDeliveryMap,
+    onCalcDeliveryFinish: onCalcDeliveryFinish,
+    onCalcDeliveryError: onCalcDeliveryError,
+    onCalcDeliveryAddressFound: onCalcDeliveryAddressFound,
+    focusAddrInput: focusAddrInput,
   },
   computed: {
+    cartCost: getCartCost,
     totalCost: getTotalCost,
+    deliveryCost: getDeliveryCost,
+    suburbDistance: getSuburbDistance,
   },
   filters: {
     currency: formatPrice,
@@ -37,10 +49,19 @@ auth = new Vue({
   watch: {
     payer: onPayerChange,
     pay: onPayChange,
+    address: onAddressChange,
   },
   components: {},
   mounted: function() {},
-  created: function() {},
+  created: function() {
+    //ymaps.ready(function(){
+      this.idm = new InteractiveDeliveryMap({
+        onCalcDeliveryFinish: this.onCalcDeliveryFinish,
+        onCalcDeliveryError: this.onCalcDeliveryError,
+        onCalcDeliveryAddressFound: this.onCalcDeliveryAddressFound,
+      });
+    //});
+  },
   el: '#cartapp',
   template: '#cartapp-template',
 });
@@ -52,9 +73,7 @@ function getProductSum(product) {
 
 /////////////////////////////////////////////////////////////
 function getTotalCost(){
-  return this.products.reduce(function(acc, item, index, arr){
-    return acc + getProductSum(item);
-  }, 0);
+  return this.cartCost + this.deliveryCost;
 }
 
 /////////////////////////////////////////////
@@ -147,20 +166,75 @@ function onPayChange(newVal, oldVal){
 }
 
 /////////////////////////////////////////////////////////////
-function calcDelivery() {
-var myGeocoder = ymaps.geocode(this.address);
-myGeocoder.then(
-    function (res) {
-        //map.geoObjects.add(res.geoObjects);
-        // Выведем в консоль данные, полученные в результате геокодирования объекта.
-        console.log(res.geoObjects.get(0));
-        console.log(res.geoObjects.get(0).properties.get('metaDataProperty').getAll());
-    },
-    function (err) {
-        // Обработка ошибки
-        console.log(err);
-    }
-);
+function showDeliveryMap() {
+  this.idm.showDelivery(this.address);
 }
+
+/////////////////////////////////////////////////////////////
+function calcDelivery() {
+  var instance = this;
+  instance.calculating = true;
+  setTimeout(function(){
+      instance.idm.calcDelivery(instance.address);
+  }, 0);
+}
+
+/////////////////////////////////////////////////////////////
+function onCalcDeliveryFinish(delivery_location, dist) {
+  this.calculating = false;
+  if (delivery_location === undefined)
+    return;
+  this.delivery_location = delivery_location;
+  if (dist !== undefined)
+    this.distance = dist;
+}
+
+/////////////////////////////////////////////////////////////
+function onCalcDeliveryError(err) {
+  this.calculating = false;
+  console.log('calcDelivery() error: ' + err);
+  //alert('CalcDeliveryFinish');
+}
+
+/////////////////////////////////////////////////////////////
+function onCalcDeliveryAddressFound(addr) {
+  addr = this.$refs.addrinput.transformAddress(addr);
+  this.address = addr;
+  return addr;
+}
+
+/////////////////////////////////////////////////////////////
+function focusAddrInput(){
+  this.$refs.addrinput.focus();
+}
+
+/////////////////////////////////////////////////////////////
+function getCartCost() {
+  return this.products.reduce(function(acc, item, index, arr){
+    return acc + getProductSum(item);
+  }, 0);
+}
+
+/////////////////////////////////////////////////////////////
+function getDeliveryCost() {
+  if (this.delivery_location >= 0) {
+    var delivery_cost = (this.cartCost < DELIVERY_FREE_LIMIT) ? DELIVERY_PRICE : 0;
+    delivery_cost += (this.delivery_location > 0) ? Math.round(this.distance / 1000 * DELIVERY_EXTRA_PAY) : 0;
+    return delivery_cost
+  } else
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////
+function onAddressChange(newVal, oldVal) {
+  if (typeof newVal === 'string' && newVal.trim() != oldVal)
+    this.delivery_location = undefined;
+}
+
+/////////////////////////////////////////////////////////////
+function getSuburbDistance() {
+  return (this.delivery_location > 0) ? Math.round(this.distance / 100) / 10 : 0;
+}
+
 
 });
