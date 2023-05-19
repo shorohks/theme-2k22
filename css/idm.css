@@ -39,6 +39,12 @@
 	line-height: 3rem;
 	cursor: pointer;
 	margin: 0;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .idm-modal-close.idm-modal-close-desktop {
@@ -47,6 +53,7 @@
 	color: white;
 	bottom: 87.5%;
 	right: 0.75rem;
+
 }
 
 .idm-modal-close.idm-modal-close-mobile {

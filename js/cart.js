@@ -167,16 +167,16 @@ function onPayChange(newVal, oldVal){
 
 /////////////////////////////////////////////////////////////
 function showDeliveryMap() {
-  this.idm.showDelivery(this.address);
+  this.idm.showDelivery(this.address, false);
 }
 
 /////////////////////////////////////////////////////////////
 function calcDelivery() {
+  if (this.calculating || !this.address)
+    return;
   var instance = this;
   instance.calculating = true;
-  setTimeout(function(){
-      instance.idm.calcDelivery(instance.address);
-  }, 0);
+  instance.idm.calcDelivery(instance.address);
 }
 
 /////////////////////////////////////////////////////////////
@@ -193,7 +193,6 @@ function onCalcDeliveryFinish(delivery_location, dist) {
 function onCalcDeliveryError(err) {
   this.calculating = false;
   console.log('calcDelivery() error: ' + err);
-  //alert('CalcDeliveryFinish');
 }
 
 /////////////////////////////////////////////////////////////
@@ -219,7 +218,7 @@ function getCartCost() {
 function getDeliveryCost() {
   if (this.delivery_location >= 0) {
     var delivery_cost = (this.cartCost < DELIVERY_FREE_LIMIT) ? DELIVERY_PRICE : 0;
-    delivery_cost += (this.delivery_location > 0) ? Math.round(this.distance / 1000 * DELIVERY_EXTRA_PAY) : 0;
+    delivery_cost += (this.delivery_location > 0) ? Math.round(this.suburbDistance * DELIVERY_EXTRA_PAY) : 0;
     return delivery_cost
   } else
     return 0;

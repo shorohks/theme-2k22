@@ -41,7 +41,7 @@ function InteractiveDeliveryMap(options) {
 
   $(window).on('hashchange', $.proxy(this.onHashChange, this));
   $('.idm-modal-close').on('click', $.proxy(this.close, this));
-  $('.idm-modal-background').on('click', $.proxy(this.onBackgroundClick, this));
+  $('.idm-modal-background').on('mousedown', $.proxy(this.onBackgroundClick, this));
   $(document).on('keyup', $.proxy(this.onKeyPress, this));
 }
 
@@ -63,14 +63,17 @@ InteractiveDeliveryMap.prototype.show = function() {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-InteractiveDeliveryMap.prototype.showDelivery = function(address) {
+InteractiveDeliveryMap.prototype.showDelivery = function(address, needCalc = true) {
   var instance = this;
   $(this.element).find('.idm-modal > div').hide();
   //$(this.element).find('.idm-modal > #deliveryMapContainer').hide();
   this.show();
-  setTimeout(function(){
+  //setTimeout(function(){
+  if (needCalc)
     instance.calcDelivery(address);
-  }, 10);
+  else
+    instance.displayDeliveryMap();
+  //}, 10);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +181,7 @@ InteractiveDeliveryMap.prototype.calcDelivery = function(address) {
 
   // Уничтожаем ранее пролаженный маршрут
   if (instance.suburb_path) {
-    instance.suburb_path.removeFromMap(instance.mapDelivery);
+    instance.mapDelivery.geoObjects.remove(instance.suburb_path);
     instance.suburb_path = undefined;
   }
 
@@ -249,42 +252,32 @@ InteractiveDeliveryMap.prototype.calcSuburbDistance = function(userCoord, cityCe
     }
 
     // Строим маршрут от центра города до пользователя
-    ymaps.route([cityCenterCoord, userCoord], {avoidTrafficJams: false, multiRoute: false, results: 10, reverseGeocoding: false}).then(function (route){
-      var pathsObjects = ymaps.geoQuery(route.getPaths());
-      // Перебераем все сегменты и разобиваем их на отрезки
-      var edges = [];
-      pathsObjects.each(function (path) {
-        var coordinates = path.geometry.getCoordinates();
-        for (var i = 1, l = coordinates.length; i < l; i++) {
-          edges.push({ type: 'LineString', coordinates: [coordinates[i], coordinates[i - 1]] });
+    ymaps.route([cityCenterCoord, userCoord], {avoidTrafficJams: false, multiRoute: true, results: 10, reverseGeocoding: false}).then(function (multiroute){
+
+      //instance.mapDelivery.geoObjects.add(multiroute);
+      //console.log(route.getRoutes().getLength());
+      var dist, min_dist, route;
+      multiroute.getRoutes().each(function(r) {
+        dist = r.getPaths().get(0).properties.get("distance").value;
+        if (min_dist === undefined || min_dist > dist) {
+          min_dist = dist;
+          route = r;
         }
       });
-      // Создаем новую выборку, состоящую из отрезков
-      var routeObjects = ymaps.geoQuery(edges);
-      routeObjects.addToMap(instance.mapDelivery);
-      // Выбираем отрезки, находящиеся внутри города
-      var objectsInCity = routeObjects.searchInside(instance.cityPolygon);
-      // Выбираем отрезки, пересекающие черту города
-      var boundaryObjects = routeObjects.searchIntersect(instance.cityPolygon);
-      // Выбираем отрезки, находящиеся за городом
-      instance.suburb_path = routeObjects.remove(objectsInCity).remove(boundaryObjects);
 
-      routeObjects.removeFromMap(instance.mapDelivery);
+      //var coodinates = route.getPaths().get(0).geometry.getCoordinates();
+      var coodinates = route.getPaths().get(0).properties.get("coordinates");
 
-      //routeObjects.setOptions('strokeWidth', 3);
-      //objectsInCity.setOptions({strokeColor: '#0500ff'});
-      //boundaryObjects.setOptions({strokeColor: '#06ff00'});
-
-      //outsideObjects.setOptions({strokeColor: '#7aba58', strokeWidth: 4, width: 10});
-      instance.suburb_path.setOptions({strokeColor: '#7ed83f', strokeWidth: 5}); //58883f
-      instance.suburb_path.addToMap(instance.mapDelivery);
-
-      var dist = 0;
-      instance.suburb_path.each(function(path) {
-        dist += path.geometry.getDistance();
+      var points = coodinates.filter(function (el, i, arr) {
+        return robustPointInPolygon(cityArea, el) > 0;
       });
 
+      instance.suburb_path = new ymaps.Polyline(points, {}, {strokeColor: '#7ed83f', strokeWidth: 5});
+      instance.mapDelivery.geoObjects.add(instance.suburb_path);
+
+      dist = instance.suburb_path.geometry.getDistance();
       instance.calcDeliveryFinish(1, dist);
+
     }, function (error){
       // Ошибка при построении маршрута
       instance.calcDeliveryError(error.message);
@@ -312,4 +305,479 @@ InteractiveDeliveryMap.prototype.calcDeliveryFinish = function(delivery_location
   if (this.options.onCalcDeliveryFinish) {
     this.options.onCalcDeliveryFinish(delivery_location, distance);
   }
+}
+
+/////////////////////////////////////////////////////////////////////////
+//   Taken from https://github.com/mikolalysenko/robust-point-in-polygon
+/////////////////////////////////////////////////////////////////////////
+function robustPointInPolygon(vs, point) {
+  var x = point[0]
+  var y = point[1]
+  var n = vs.length
+  var inside = 1
+  var lim = n
+  for(var i = 0, j = n-1; i<lim; j=i++) {
+    var a = vs[i]
+    var b = vs[j]
+    var yi = a[1]
+    var yj = b[1]
+    if(yj < yi) {
+      if(yj < y && y < yi) {
+        var s = orient(a, b, point)
+        if(s === 0) {
+          return 0
+        } else {
+          inside ^= (0 < s)|0
+        }
+      } else if(y === yi) {
+        var c = vs[(i+1)%n]
+        var yk = c[1]
+        if(yi < yk) {
+          var s = orient(a, b, point)
+          if(s === 0) {
+            return 0
+          } else {
+            inside ^= (0 < s)|0
+          }
+        }
+      }
+    } else if(yi < yj) {
+      if(yi < y && y < yj) {
+        var s = orient(a, b, point)
+        if(s === 0) {
+          return 0
+        } else {
+          inside ^= (s < 0)|0
+        }
+      } else if(y === yi) {
+        var c = vs[(i+1)%n]
+        var yk = c[1]
+        if(yk < yi) {
+          var s = orient(a, b, point)
+          if(s === 0) {
+            return 0
+          } else {
+            inside ^= (s < 0)|0
+          }
+        }
+      }
+    } else if(y === yi) {
+      var x0 = Math.min(a[0], b[0])
+      var x1 = Math.max(a[0], b[0])
+      if(i === 0) {
+        while(j>0) {
+          var k = (j+n-1)%n
+          var p = vs[k]
+          if(p[1] !== y) {
+            break
+          }
+          var px = p[0]
+          x0 = Math.min(x0, px)
+          x1 = Math.max(x1, px)
+          j = k
+        }
+        if(j === 0) {
+          if(x0 <= x && x <= x1) {
+            return 0
+          }
+          return 1
+        }
+        lim = j+1
+      }
+      var y0 = vs[(j+n-1)%n][1]
+      while(i+1<lim) {
+        var p = vs[i+1]
+        if(p[1] !== y) {
+          break
+        }
+        var px = p[0]
+        x0 = Math.min(x0, px)
+        x1 = Math.max(x1, px)
+        i += 1
+      }
+      if(x0 <= x && x <= x1) {
+        return 0
+      }
+      var y1 = vs[(i+1)%n][1]
+      if(x < x0 && (y0 < y !== y1 < y)) {
+        inside ^= 1
+      }
+    }
+  }
+  return 2 * inside - 1
+}
+
+/////////////////////////////////////////////////////////////////////////
+var EPSILON     = 1.1102230246251565e-16
+var ERRBOUND3   = (3.0 + 16.0 * EPSILON) * EPSILON
+
+function orient(a, b, c) {
+    var l = (a[1] - c[1]) * (b[0] - c[0])
+    var r = (a[0] - c[0]) * (b[1] - c[1])
+    var det = l - r
+    var s
+    if(l > 0) {
+      if(r <= 0) {
+        return det
+      } else {
+        s = l + r
+      }
+    } else if(l < 0) {
+      if(r >= 0) {
+        return det
+      } else {
+        s = -(l + r)
+      }
+    } else {
+      return det
+    }
+    var tol = ERRBOUND3 * s
+    if(det >= tol || det <= -tol) {
+      return det
+    }
+    return orientation3Exact(a, b, c)
+}
+
+/////////////////////////////////////////////////////////////////////////
+function orientation3Exact(m0, m1, m2) {
+    var p = linearExpansionSum(linearExpansionSum(twoProduct(m1[1], m2[0]), twoProduct(-m2[1], m1[0])), linearExpansionSum(twoProduct(m0[1], m1[0]), twoProduct(-m1[1], m0[0])))
+    var n = linearExpansionSum(twoProduct(m0[1], m2[0]), twoProduct(-m2[1], m0[0]))
+    var d = robustSubtract(p, n)
+    return d[d.length - 1]
+  }
+
+//Easy case: Add two scalars
+function scalarScalar(a, b) {
+  var x = a + b
+  var bv = x - a
+  var av = x - bv
+  var br = b - bv
+  var ar = a - av
+  var y = ar + br
+  if(y) {
+    return [y, x]
+  }
+  return [x]
+}
+
+function linearExpansionSum(e, f) {
+  var ne = e.length|0
+  var nf = f.length|0
+  if(ne === 1 && nf === 1) {
+    return scalarScalar(e[0], f[0])
+  }
+  var n = ne + nf
+  var g = new Array(n)
+  var count = 0
+  var eptr = 0
+  var fptr = 0
+  var abs = Math.abs
+  var ei = e[eptr]
+  var ea = abs(ei)
+  var fi = f[fptr]
+  var fa = abs(fi)
+  var a, b
+  if(ea < fa) {
+    b = ei
+    eptr += 1
+    if(eptr < ne) {
+      ei = e[eptr]
+      ea = abs(ei)
+    }
+  } else {
+    b = fi
+    fptr += 1
+    if(fptr < nf) {
+      fi = f[fptr]
+      fa = abs(fi)
+    }
+  }
+  if((eptr < ne && ea < fa) || (fptr >= nf)) {
+    a = ei
+    eptr += 1
+    if(eptr < ne) {
+      ei = e[eptr]
+      ea = abs(ei)
+    }
+  } else {
+    a = fi
+    fptr += 1
+    if(fptr < nf) {
+      fi = f[fptr]
+      fa = abs(fi)
+    }
+  }
+  var x = a + b
+  var bv = x - a
+  var y = b - bv
+  var q0 = y
+  var q1 = x
+  var _x, _bv, _av, _br, _ar
+  while(eptr < ne && fptr < nf) {
+    if(ea < fa) {
+      a = ei
+      eptr += 1
+      if(eptr < ne) {
+        ei = e[eptr]
+        ea = abs(ei)
+      }
+    } else {
+      a = fi
+      fptr += 1
+      if(fptr < nf) {
+        fi = f[fptr]
+        fa = abs(fi)
+      }
+    }
+    b = q0
+    x = a + b
+    bv = x - a
+    y = b - bv
+    if(y) {
+      g[count++] = y
+    }
+    _x = q1 + x
+    _bv = _x - q1
+    _av = _x - _bv
+    _br = x - _bv
+    _ar = q1 - _av
+    q0 = _ar + _br
+    q1 = _x
+  }
+  while(eptr < ne) {
+    a = ei
+    b = q0
+    x = a + b
+    bv = x - a
+    y = b - bv
+    if(y) {
+      g[count++] = y
+    }
+    _x = q1 + x
+    _bv = _x - q1
+    _av = _x - _bv
+    _br = x - _bv
+    _ar = q1 - _av
+    q0 = _ar + _br
+    q1 = _x
+    eptr += 1
+    if(eptr < ne) {
+      ei = e[eptr]
+    }
+  }
+  while(fptr < nf) {
+    a = fi
+    b = q0
+    x = a + b
+    bv = x - a
+    y = b - bv
+    if(y) {
+      g[count++] = y
+    }
+    _x = q1 + x
+    _bv = _x - q1
+    _av = _x - _bv
+    _br = x - _bv
+    _ar = q1 - _av
+    q0 = _ar + _br
+    q1 = _x
+    fptr += 1
+    if(fptr < nf) {
+      fi = f[fptr]
+    }
+  }
+  if(q0) {
+    g[count++] = q0
+  }
+  if(q1) {
+    g[count++] = q1
+  }
+  if(!count) {
+    g[count++] = 0.0
+  }
+  g.length = count
+  return g
+}
+
+var SPLITTER = +(Math.pow(2, 27) + 1.0)
+
+function twoProduct(a, b, result) {
+  var x = a * b
+
+  var c = SPLITTER * a
+  var abig = c - a
+  var ahi = c - abig
+  var alo = a - ahi
+
+  var d = SPLITTER * b
+  var bbig = d - b
+  var bhi = d - bbig
+  var blo = b - bhi
+
+  var err1 = x - (ahi * bhi)
+  var err2 = err1 - (alo * bhi)
+  var err3 = err2 - (ahi * blo)
+
+  var y = alo * blo - err3
+
+  if(result) {
+    result[0] = y
+    result[1] = x
+    return result
+  }
+
+  return [ y, x ]
+}
+
+//Easy case: Add two scalars
+function scalarScalar(a, b) {
+  var x = a + b
+  var bv = x - a
+  var av = x - bv
+  var br = b - bv
+  var ar = a - av
+  var y = ar + br
+  if(y) {
+    return [y, x]
+  }
+  return [x]
+}
+
+function robustSubtract(e, f) {
+  var ne = e.length|0
+  var nf = f.length|0
+  if(ne === 1 && nf === 1) {
+    return scalarScalar(e[0], -f[0])
+  }
+  var n = ne + nf
+  var g = new Array(n)
+  var count = 0
+  var eptr = 0
+  var fptr = 0
+  var abs = Math.abs
+  var ei = e[eptr]
+  var ea = abs(ei)
+  var fi = -f[fptr]
+  var fa = abs(fi)
+  var a, b
+  if(ea < fa) {
+    b = ei
+    eptr += 1
+    if(eptr < ne) {
+      ei = e[eptr]
+      ea = abs(ei)
+    }
+  } else {
+    b = fi
+    fptr += 1
+    if(fptr < nf) {
+      fi = -f[fptr]
+      fa = abs(fi)
+    }
+  }
+  if((eptr < ne && ea < fa) || (fptr >= nf)) {
+    a = ei
+    eptr += 1
+    if(eptr < ne) {
+      ei = e[eptr]
+      ea = abs(ei)
+    }
+  } else {
+    a = fi
+    fptr += 1
+    if(fptr < nf) {
+      fi = -f[fptr]
+      fa = abs(fi)
+    }
+  }
+  var x = a + b
+  var bv = x - a
+  var y = b - bv
+  var q0 = y
+  var q1 = x
+  var _x, _bv, _av, _br, _ar
+  while(eptr < ne && fptr < nf) {
+    if(ea < fa) {
+      a = ei
+      eptr += 1
+      if(eptr < ne) {
+        ei = e[eptr]
+        ea = abs(ei)
+      }
+    } else {
+      a = fi
+      fptr += 1
+      if(fptr < nf) {
+        fi = -f[fptr]
+        fa = abs(fi)
+      }
+    }
+    b = q0
+    x = a + b
+    bv = x - a
+    y = b - bv
+    if(y) {
+      g[count++] = y
+    }
+    _x = q1 + x
+    _bv = _x - q1
+    _av = _x - _bv
+    _br = x - _bv
+    _ar = q1 - _av
+    q0 = _ar + _br
+    q1 = _x
+  }
+  while(eptr < ne) {
+    a = ei
+    b = q0
+    x = a + b
+    bv = x - a
+    y = b - bv
+    if(y) {
+      g[count++] = y
+    }
+    _x = q1 + x
+    _bv = _x - q1
+    _av = _x - _bv
+    _br = x - _bv
+    _ar = q1 - _av
+    q0 = _ar + _br
+    q1 = _x
+    eptr += 1
+    if(eptr < ne) {
+      ei = e[eptr]
+    }
+  }
+  while(fptr < nf) {
+    a = fi
+    b = q0
+    x = a + b
+    bv = x - a
+    y = b - bv
+    if(y) {
+      g[count++] = y
+    }
+    _x = q1 + x
+    _bv = _x - q1
+    _av = _x - _bv
+    _br = x - _bv
+    _ar = q1 - _av
+    q0 = _ar + _br
+    q1 = _x
+    fptr += 1
+    if(fptr < nf) {
+      fi = -f[fptr]
+    }
+  }
+  if(q0) {
+    g[count++] = q0
+  }
+  if(q1) {
+    g[count++] = q1
+  }
+  if(!count) {
+    g[count++] = 0.0
+  }
+  g.length = count
+  return g
 }

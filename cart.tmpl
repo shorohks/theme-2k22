@@ -141,7 +141,7 @@
         <div v-if="delivery == DELIVERY_COURIER" class="form-row">
           <label>Адрес</label>
           <div class="input-btn">
-            <vue-input-address v-model="address" ref="addrinput" v-on:bluer="calcDelivery"/>
+            <vue-input-address v-model="address" ref="addrinput" v-on:blur="calcDelivery" v-on:suggestSelect="calcDelivery" />
             <div v-on:click="calcDelivery">
               <i v-if="calculating" class="powericon-spinner powericon-pulse"></i>
               <i v-else class="powericon-calc"></i>
