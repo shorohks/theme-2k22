@@ -8,9 +8,14 @@ function InteractiveDeliveryMap(options) {
   var defaults = {
     hash: '#map',
     clear_hash_on_startup: true,
+    cargo: [],
+    onPickupsReady: undefined,
     onCalcDeliveryFinish: undefined,
     onCalcDeliveryError: undefined,
     onCalcDeliveryAddressFound: undefined,
+    onCalcPickupFinish: undefined,
+    onCalcPickupError: undefined,
+    onPickupSelect: undefined,
   };
   this.options = $.extend({}, defaults, options);
   this.mapDelivery = undefined;
@@ -21,6 +26,7 @@ function InteractiveDeliveryMap(options) {
   this.lastAreaSign = undefined;
   this.cityPolygon = undefined;
   this.suburb_path = undefined;
+  this.pickup_first_run = true;
 
   if (this.options.clear_hash_on_startup && location.hash == this.options.hash)
     history.replaceState(undefined, document.title, ' ');
@@ -39,10 +45,29 @@ function InteractiveDeliveryMap(options) {
     '<div class="idm-modal-close idm-modal-close-mobile">&times;</div>';
   this.element = $(template).appendTo('body');
 
+
   $(window).on('hashchange', $.proxy(this.onHashChange, this));
   $('.idm-modal-close').on('click', $.proxy(this.close, this));
   $('.idm-modal-background').on('mousedown', $.proxy(this.onBackgroundClick, this));
   $(document).on('keyup', $.proxy(this.onKeyPress, this));
+
+  $(this.element).find('.idm-modal > #pickupMapContainer').yadc({
+    site_id: 2,
+    height: '100%',
+    //map_сenter: [lat, lon],
+    auto_geolocation: true,
+    mark_center: true,
+    smart_zoom: false,
+    manual_pvz_adding: true,
+    geolocation_provider: 'auto',
+    auto_open_custom_pickup: false,
+    map_scale: 18,
+    pickup_button: true,
+    onReady: $.proxy(this.onYADCReady, this),
+    onPickupSelect: $.proxy(this.onPickupSelectClick, this),
+    cargo: this.options.cargo,
+  });
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,14 +91,39 @@ InteractiveDeliveryMap.prototype.show = function() {
 InteractiveDeliveryMap.prototype.showDelivery = function(address, needCalc = true) {
   var instance = this;
   $(this.element).find('.idm-modal > div').hide();
-  //$(this.element).find('.idm-modal > #deliveryMapContainer').hide();
   this.show();
-  //setTimeout(function(){
   if (needCalc)
     instance.calcDelivery(address);
   else
     instance.displayDeliveryMap();
-  //}, 10);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+InteractiveDeliveryMap.prototype.showPickup = function(pvz_id) {
+  var instance = this;
+  $(instance.element).find('.idm-modal > div').hide(0);
+  instance.show();
+  var el = $(instance.element).find('.idm-modal > #pickupMapContainer');
+  setTimeout(function() {
+    // Если первое открытие - добавляем ПВЗ в ObjectManager (долгая операция) пока в окне крутится спиннер
+    if (instance.pickup_first_run)
+      el.yadc('addPVZToObjectManager');
+    // Отображаем yadc
+    el.show(0, function(){
+      el.yadc('onMapSizeChange');
+      if (instance.pickup_first_run) {
+        setTimeout(function(){
+          el.yadc('smartBounds');
+          instance.pickup_first_run = false;
+        }, 100);
+      } else
+        el.yadc('updateMap');
+      if (pvz_id)
+        el.yadc('openPVZBaloon', pvz_id);
+      el.yadc('updateBalloon');
+      el.yadc('updateList');
+    });
+  }, 100);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,14 +181,17 @@ InteractiveDeliveryMap.prototype.setDeliveryMapCenter = function(coord) {
 InteractiveDeliveryMap.prototype.setDeliveryPlacemark = function(coord, loc) {
   var preset = (loc !== undefined) ? 'islands#blueGovernmentIcon' : 'islands#redStretchyIcon';
   if (!this.placemark) {
+
     this.placemark = new ymaps.Placemark(coord, {
       hintContent: "Перетащите метку для уточнения адреса доставки",
       iconContent: "Нет доставки",
     }, {
       preset: preset,
-      draggable: true
+      draggable: false
     });
+
     this.mapDelivery.geoObjects.add(this.placemark);
+
   } else {
     this.placemark.geometry.setCoordinates(coord);
     this.placemark.options.set('preset', preset);
@@ -254,8 +307,6 @@ InteractiveDeliveryMap.prototype.calcSuburbDistance = function(userCoord, cityCe
     // Строим маршрут от центра города до пользователя
     ymaps.route([cityCenterCoord, userCoord], {avoidTrafficJams: false, multiRoute: true, results: 10, reverseGeocoding: false}).then(function (multiroute){
 
-      //instance.mapDelivery.geoObjects.add(multiroute);
-      //console.log(route.getRoutes().getLength());
       var dist, min_dist, route;
       multiroute.getRoutes().each(function(r) {
         dist = r.getPaths().get(0).properties.get("distance").value;
@@ -304,6 +355,56 @@ InteractiveDeliveryMap.prototype.calcDeliveryError = function(err) {
 InteractiveDeliveryMap.prototype.calcDeliveryFinish = function(delivery_location, distance) {
   if (this.options.onCalcDeliveryFinish) {
     this.options.onCalcDeliveryFinish(delivery_location, distance);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+InteractiveDeliveryMap.prototype.onPickupSelectClick = function(pvz) {
+  if (this.options.onPickupSelect) {
+    this.options.onPickupSelect(pvz);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+InteractiveDeliveryMap.prototype.setCargo = function(cargo) {
+  var instance = this;
+
+  instance.options.cargo = cargo;
+
+  el = $(instance.element).find('.idm-modal > #pickupMapContainer');
+  if ($.data(el[0], 'yadc'))
+    el.yadc('setCargo', cargo);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+InteractiveDeliveryMap.prototype.calculatePickupPrice = function(pvz_id, cargo) {
+  var instance = this;
+  $.ajax({
+    url: '//api.yadc-js.ru/calculate.json',
+    type: 'POST',
+    cache: false,
+    data: {
+      'site_id': 2,
+      'pickup_id': pvz_id,
+      'cargo': JSON.stringify(cargo || instance.cargo),
+    },
+    dataType: 'json',
+  }).done(function(data) {
+    if (instance.options.onCalcPickupFinish) {
+      instance.options.onCalcPickupFinish(data.price);
+    }
+  }).fail(function (jqXHR, textStatus) {
+    console.log('Error calculatePickupPrice() - ' + textStatus);
+    if (instance.options.onCalcPickupError) {
+      instance.options.onCalcPickupError(textStatus);
+    }
+  });
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+InteractiveDeliveryMap.prototype.onYADCReady = function() {
+  if (this.options.onPickupsReady) {
+    this.options.onPickupsReady();
   }
 }
 

@@ -28,6 +28,9 @@
 .powericon-trash:before {
   content: "\f014";
 }
+.powericon-location:before {
+  content: "\f05b";
+}
 .powericon-exclamation_sign:before {
   content: "\f06a";
 }

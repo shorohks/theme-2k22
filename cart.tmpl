@@ -10,7 +10,6 @@
   <script src="/theme/js/lib/vue/vue.js" type="text/javascript"></script>
   <script src="//api-maps.yandex.ru/2.1/?apikey=1d361db1-2796-4a44-80ea-487b93817c0a&lang=ru_RU" type="text/javascript"></script>
   <script src="//cdn.yadc-js.ru/yadc.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/theme/js/map-calculator.js" type="text/javascript"></script>
   <script src="/theme/js/lib/vue-input-numeric/vue-input-numeric.min.js" type="text/javascript"></script>
   <script src="/theme/js/lib/vue-input-address/vue-input-address.min.js" type="text/javascript"></script>
   <link href="/theme/css/idm.css" rel="stylesheet" media="all" />
@@ -59,6 +58,8 @@
            model: "<TMPL_VAR NAME='model'>",
            price: <TMPL_VAR NAME='price'>,
            image_big: "<TMPL_VAR NAME='image_big'>",
+           <TMPL_IF NAME="weight">weight: <TMPL_VAR NAME="weight">,</TMPL_IF>
+           <TMPL_IF NAME="volume">volume: <TMPL_VAR NAME="volume">,</TMPL_IF>
         },
       </TMPL_LOOP>
       </TMPL_IF>
@@ -101,20 +102,35 @@
         <div class="delivery">
           <div class="pic"></div>
           <div class="product">
-            <span v-if="delivery == DELIVERY_COURIER">Доставка по адресу <template v-if="delivery_location > 0">({{suburbDistance}}&nbsp;км)</template></span>
-            <span v-if="delivery == DELIVERY_PICKUP">Доставка в пункт выдачи</span>
-            <a v-if="delivery == DELIVERY_PICKUP" href="#" class="address">Выберите пункт выдачи&nbsp;<i class="powericon-exclamation_sign"></i></a>
-            <a v-if="delivery == DELIVERY_COURIER && !address" href="#" class="address" v-on:click.prevent="$refs.addrinput.focus()">Укажите адрес доставки&nbsp;<i class="powericon-exclamation_sign"></i></a>
-            <a v-if="delivery == DELIVERY_COURIER && address" v-on:click.prevent="showDeliveryMap" href="#" class="address">{{address}}</a>
+            <template v-if="delivery == DELIVERY_COURIER">
+              <span>Доставка по адресу <template v-if="delivery_location > 0">({{suburbDistance}}&nbsp;км)</template></span>
+              <a v-if="String(this.address).trim() != ''" v-on:click.prevent="showDeliveryMap" href="#" class="address">{{address}}</a>
+              <a v-else v-on:click.prevent="$refs.addrinput.focus()" href="#" class="address">Укажите адрес доставки <!-- &nbsp;<i class="powericon-exclamation_sign"></i> --> </a>
+            </template>
+            <template v-if="delivery == DELIVERY_PICKUP">
+              <span>Доставка в пункт выдачи</span>
+              <div v-if="!pickups_ready"><i class="powericon-spinner powericon-pulse"></i></div>
+              <a v-else-if="pvz" v-on:click.prevent="showPickup" href="#" class="address">{{pvz.city}}, {{pvz.address}}</a>
+              <a v-else v-on:click.prevent="showPickup" href="#" class="address">Выберите пункт выдачи <!-- &nbsp;<i class="powericon-exclamation_sign"></i> --> </a>
+            </template>
           </div>
           <div class="price"></div>
           <div class="qty"></div>
           <div class="amount">
-            <div v-if="calculating"><i class="powericon-spinner powericon-pulse"></i></div>
-            <template v-else-if="delivery_location === undefined"></template>
-            <template v-else-if="delivery_location < 0">Нет доставки</template>
-            <template v-else-if="deliveryCost == 0">Бесплатно</template>
-            <template v-else>{{deliveryCost|currency}}&nbsp;&#8381;</template>
+            <template v-if="delivery == DELIVERY_COURIER">
+              <div v-if="calculating_delivery"><i class="powericon-spinner powericon-pulse"></i></div>
+              <template v-else-if="delivery_location === undefined"></template>
+              <template v-else-if="delivery_location < 0">Нет доставки</template>
+              <template v-else-if="deliveryCost == 0">Бесплатно</template>
+              <template v-else>{{deliveryCost|currency}}&nbsp;&#8381;</template>
+           </template>
+           <template v-if="delivery == DELIVERY_PICKUP">
+              <div v-if="calculating_pickup"><i class="powericon-spinner powericon-pulse"></i></div>
+              <template v-else-if="pvz">
+                 <template v-if="pvz.price > 0">{{pvz.price|currency}}&nbsp;&#8381;</template>
+                 <template v-else-if="pvz.price === 0">Бесплатно</template>
+              </template>
+           </template>
           </div>
           <div class="trash"></div>
         </div>
@@ -142,15 +158,20 @@
           <label>Адрес</label>
           <div class="input-btn">
             <vue-input-address v-model="address" ref="addrinput" v-on:blur="calcDelivery" v-on:suggestSelect="calcDelivery" />
-            <div v-on:click="calcDelivery">
-              <i v-if="calculating" class="powericon-spinner powericon-pulse"></i>
+            <div v-show="ymaps_ready" v-on:click="calcDelivery">
+              <i v-if="calculating_delivery" class="powericon-spinner powericon-pulse"></i>
+              <i v-else-if="String(this.address).trim() == ''" class="powericon-location"></i>
               <i v-else class="powericon-calc"></i>
             </div>
           </div>
         </div>
         <div v-if="delivery == DELIVERY_PICKUP" class="form-row">
           <label>Пункт выдачи</label>
-          <div><a v-on:click.prevent="onChoosePickupClick" href="#pickups" class="dotted" style="margin: 0.64em 0">Выберите пункт выдачи</a>&nbsp;<sup><i class="powericon-exclamation_sign"></i></sup></div>
+          <div>
+            <template v-if="!pickups_ready"><i class="powericon-spinner powericon-pulse"></i></template>
+            <a v-else-if="pvz" v-on:click.prevent="showPickup" href="#pickups" class="dotted" style="margin: 0.64em 0">{{pvz.city}}, {{pvz.address}}</a> <!-- &nbsp;<sup><i class="powericon-exclamation_sign"></i></sup> -->
+            <a v-else v-on:click.prevent="showPickup" href="#pickups" class="dotted" style="margin: 0.64em 0">Выберите пункт выдачи</a> <!-- &nbsp;<sup><i class="powericon-exclamation_sign"></i></sup> -->
+          </div>
         </div>
         <div class="form-row">
           <label>Получатель</label>

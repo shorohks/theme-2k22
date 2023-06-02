@@ -1,8 +1,6 @@
 $(function() {
 
-loadDeliveryJSON();
-
-auth = new Vue({
+cart = new Vue({
   data: {
     DELIVERY_COURIER: 0,
     DELIVERY_PICKUP: 2,
@@ -17,16 +15,18 @@ auth = new Vue({
     pay: 1,
     address: undefined,
     distance: 0,
-    idm: undefined,
-    calculating: false,
+    calculating_delivery: false,
+    calculating_pickup: false,
     delivery_location: undefined,		// 0/1/2 - нет доставки/по городу/за город
+    pvz: undefined,
+    ymaps_ready: false,
+    pickups_ready: false,
   },
   methods: {
     getProductSum: getProductSum,
     getProductsCount: getProductsCount,
     onDeleteProductClick: onDeleteProductClick,
     onProductQuantityChange: onProductQuantityChange,
-    onChoosePickupClick: onChoosePickupClick,
     ajaxDeleteProduct: ajaxDeleteProduct,
     ajaxUpdateCart: ajaxUpdateCart,
     updateCounterIcon: updateCounterIcon,
@@ -35,7 +35,15 @@ auth = new Vue({
     onCalcDeliveryFinish: onCalcDeliveryFinish,
     onCalcDeliveryError: onCalcDeliveryError,
     onCalcDeliveryAddressFound: onCalcDeliveryAddressFound,
+    onCalcPickupFinish: onCalcPickupFinish,
+    onCalcPickupError: onCalcPickupError,
     focusAddrInput: focusAddrInput,
+    showPickup: showPickup,
+    showDelivery: showDelivery,
+    onPickupSelect: onPickupSelect,
+    onPickupsReady: onPickupsReady,
+    getCargo: getCargo,
+    updateCargo: updateCargo,
   },
   computed: {
     cartCost: getCartCost,
@@ -54,13 +62,20 @@ auth = new Vue({
   components: {},
   mounted: function() {},
   created: function() {
-    //ymaps.ready(function(){
-      this.idm = new InteractiveDeliveryMap({
-        onCalcDeliveryFinish: this.onCalcDeliveryFinish,
-        onCalcDeliveryError: this.onCalcDeliveryError,
-        onCalcDeliveryAddressFound: this.onCalcDeliveryAddressFound,
+      var instance = this;
+      ymaps.ready(function(){
+        window.idm = new InteractiveDeliveryMap({
+          cargo: instance.getCargo(),
+          onPickupsReady: instance.onPickupsReady,
+          onCalcDeliveryFinish: instance.onCalcDeliveryFinish,
+          onCalcDeliveryError: instance.onCalcDeliveryError,
+          onCalcDeliveryAddressFound: instance.onCalcDeliveryAddressFound,
+          onPickupSelect: instance.onPickupSelect,
+          onCalcPickupFinish: instance.onCalcPickupFinish,
+          onCalcPickupError: instance.onCalcPickupError,
+        });
+        instance.ymaps_ready = true;
       });
-    //});
   },
   el: '#cartapp',
   template: '#cartapp-template',
@@ -90,12 +105,14 @@ function onDeleteProductClick(product){
   });
   this.ajaxDeleteProduct(product);
   this.updateCounterIcon();
+  this.updateCargo();
 }
 
 /////////////////////////////////////////////
 function onProductQuantityChange(product){
   this.ajaxUpdateCart();
   this.updateCounterIcon();
+  this.updateCargo();
 }
 
 /////////////////////////////////////////////
@@ -148,12 +165,6 @@ function formatPriceCustom(amount, denomination) {
 }
 
 /////////////////////////////////////////////////////////////
-function onChoosePickupClick(){
-  window.history.pushState({}, '', '#pickups');
-  showPickups();
-}
-
-/////////////////////////////////////////////////////////////
 function onPayerChange(newVal, oldVal){
   if (newVal == this.PAYER_LEGAL)
     this.pay = this.PAY_BILL;
@@ -167,21 +178,22 @@ function onPayChange(newVal, oldVal){
 
 /////////////////////////////////////////////////////////////
 function showDeliveryMap() {
-  this.idm.showDelivery(this.address, false);
+  var instance = this;
+  window.idm.showDelivery(this.address, false);
 }
 
 /////////////////////////////////////////////////////////////
 function calcDelivery() {
-  if (this.calculating || !this.address)
+  if (this.calculating_delivery || !this.ymaps_ready)
     return;
   var instance = this;
-  instance.calculating = true;
-  instance.idm.calcDelivery(instance.address);
+  instance.calculating_delivery = true;
+  window.idm.calcDelivery(String(instance.address).trim());
 }
 
 /////////////////////////////////////////////////////////////
 function onCalcDeliveryFinish(delivery_location, dist) {
-  this.calculating = false;
+  this.calculating_delivery = false;
   if (delivery_location === undefined)
     return;
   this.delivery_location = delivery_location;
@@ -191,7 +203,7 @@ function onCalcDeliveryFinish(delivery_location, dist) {
 
 /////////////////////////////////////////////////////////////
 function onCalcDeliveryError(err) {
-  this.calculating = false;
+  this.calculating_delivery = false;
   console.log('calcDelivery() error: ' + err);
 }
 
@@ -235,5 +247,72 @@ function getSuburbDistance() {
   return (this.delivery_location > 0) ? Math.round(this.distance / 100) / 10 : 0;
 }
 
+/////////////////////////////////////////////////////////////
+function showPickup() {
+  var instance = this;
+  //setTimeout(function(){
+  window.idm.showPickup(instance.pvz ? instance.pvz.id : undefined);
+  //}, 1);
+}
+
+/////////////////////////////////////////////////////////////
+function showDelivery() {
+var instance = this;
+setTimeout(function(){
+  window.idm.showDelivery();
+}, 1);
+}
+
+/////////////////////////////////////////////////////////////
+function getCargo(){
+  return this.products.map(function(item, index, arr){
+    var newItem = {
+      id: item.code,
+      count: item.quantity,
+      price: item.price,
+    };
+    if (item.weight)
+      newItem.weight = item.weight;
+    if (item.volume)
+      newItem.volume = item.volume;
+    return newItem;
+  });
+}
+/////////////////////////////////////////////////////////////
+function onPickupSelect(pvz) {
+  this.pvz = JSON.parse(JSON.stringify(pvz));
+  if (this.pvz.inprogress == 1) {
+    this.calculating_pickup = true;
+    window.idm.calculatePickupPrice(this.pvz.id, this.getCargo());
+  }
+}
+
+/////////////////////////////////////////////////////////////
+function updateCargo() {
+  window.idm.setCargo(this.getCargo());
+  if (this.pvz) {
+    this.calculating_pickup = true;
+    window.idm.calculatePickupPrice(this.pvz.id, this.getCargo());
+  }
+}
+
+/////////////////////////////////////////////////////////////
+function onCalcPickupFinish(price) {
+  if (this.pvz)
+    this.pvz.price = price;
+  this.calculating_pickup = false;
+}
+
+/////////////////////////////////////////////////////////////
+function onCalcPickupError(err) {
+  if (this.pvz)
+    this.pvz.price = undefined;
+  this.calculating_pickup = false;
+}
+
+/////////////////////////////////////////////////////////////
+function onPickupsReady() {
+  this.pickups_ready = true;
+}
 
 });
