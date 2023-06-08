@@ -16,6 +16,8 @@ function InteractiveDeliveryMap(options) {
     onCalcPickupFinish: undefined,
     onCalcPickupError: undefined,
     onPickupSelect: undefined,
+    onPickupCity: undefined,
+    onPickupCityError: undefined,
   };
   this.options = $.extend({}, defaults, options);
   this.mapDelivery = undefined;
@@ -200,6 +202,17 @@ InteractiveDeliveryMap.prototype.setDeliveryPlacemark = function(coord, loc) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 InteractiveDeliveryMap.prototype.getDeliveryGeoLocator = function(address) {
+  // COMMENT LINE BELOW!!!!
+  //return   ymaps.geocode([55.76, 37.64], {}); // Москва
+  //return   ymaps.geocode([55.91842865097746, 37.67366708755087], {}); // Мытищи
+  //return   ymaps.geocode([54.0503060853841, 58.02375854489996], {}); //Белорецк
+  //return   ymaps.geocode([47.228639, 39.715958], {}); // Ростов-на-Дону
+  //return   ymaps.geocode([54.0503060853841, 58.02375854489996], {}); // Белорецк
+  //return   ymaps.geocode([62.912986115138374, 73.85093749999923], {}); // Ханты-манты
+  //return   ymaps.geocode([63.80332624792426, 85.8040624999952], {}); // Красноярский край
+  //return   ymaps.geocode([47.122093, 39.729562], {}); // Ростовская обл.
+  //return   ymaps.geocode([59.797622, 30.639642], {}); // Ленинградская обл.
+  //
   if (address === undefined || address === '')
     return ymaps.geolocation.get({provider: 'auto',});
   else
@@ -253,7 +266,7 @@ InteractiveDeliveryMap.prototype.calcDelivery = function(address) {
     // Оповещаем о нахождении адреса, если геолоцировали без адреса
     if (address === undefined || address == '') {
       if (instance.options.onCalcDeliveryAddressFound) {
-        res = instance.options.onCalcDeliveryAddressFound(addr);
+        res = instance.options.onCalcDeliveryAddressFound(addr, coord);
         // Нам вернули обработанный адрес?
         if (res !== undefined && typeof res === 'string')
           address = res;
@@ -406,6 +419,29 @@ InteractiveDeliveryMap.prototype.onYADCReady = function() {
   if (this.options.onPickupsReady) {
     this.options.onPickupsReady();
   }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+InteractiveDeliveryMap.prototype.getPickupCityByCoord = function(coord, cargo) {
+  var instance = this;
+  $.ajax({
+    url: '//api.yadc-js.ru/city.json',
+    type: 'POST',
+    cache: false,
+	dataType: 'json',
+    data: {
+      'site_id': 2,
+      'latitude': coord[0],
+      'longitude': coord[1],
+      'cargo': JSON.stringify([cargo || {}]),
+    },
+    }).done(function(data) {
+      if (instance.options.onPickupCity)
+        instance.options.onPickupCity(data);
+    }).fail(function(){
+      if (instance.options.onPickupCityError)
+        instance.options.onPickupCityError();
+    });
 }
 
 /////////////////////////////////////////////////////////////////////////
