@@ -444,6 +444,26 @@ InteractiveDeliveryMap.prototype.getPickupCityByCoord = function(coord, cargo) {
     });
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+InteractiveDeliveryMap.prototype.getPickupCitiesList = function() {
+  var instance = this;
+  $.ajax({
+    url: '//api.yadc-js.ru/cities.json',
+    type: 'POST',
+    cache: false,
+	dataType: 'json',
+    data: {
+      site_id: 2,
+    },
+    }).done(function(data) {
+      if (instance.options.onPickupCitiesList)
+        instance.options.onPickupCitiesList(data);
+    }).fail(function(){
+      if (instance.options.onPickupCitiesListError)
+        instance.options.onPickupCitiesListtError();
+    });
+}
+
 /////////////////////////////////////////////////////////////////////////
 //   Taken from https://github.com/mikolalysenko/robust-point-in-polygon
 /////////////////////////////////////////////////////////////////////////
