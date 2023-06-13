@@ -9,71 +9,58 @@ $(document).ready(function() {
 
   window.swiper = new Swipe(document.querySelector('#slider'), { speed: 200, callback: onSwipe});
 
-  $('.product .gallery > a').on('click', onGalleryItemClick)
+  $('.product .gallery > a').on('click', onGalleryItemClick);
+  $('#city').on('click', onCityClick);
 
   Fancybox.bind("[data-fancybox]", {});
 
   $('#pickup-points').on('click', function(e){
     e.preventDefault();
     window.idm.showPickup();
-  })
+  });
+
+  var city = getCookie('idm_city');
+  var delivery_location = getCookie('idm_delivery_location');
+  var distance = getCookie('idm_suburb_distance');
+  if (city)
+    displayCity(city);
+  if (delivery_location !== undefined)
+    onCalcDeliveryFinish(delivery_location, distance);
 
   ymaps.ready(function(){
     window.idm = new InteractiveDeliveryMap({
+      pickup_button: false,
       cargo: cargo || {},
       onCalcDeliveryAddressFound: function(addr, coord) {
         window.idm.getPickupCityByCoord(coord, cargo || {});
       },
-      onCalcDeliveryFinish: function(delivery_location, distance) {
-        switch (delivery_location) {
-          case -1:
-            // Нет доставки
-            displayDelivery(-1);
-            break;
-          case 0:
-            // Пользователь в пределах города
-            displayDelivery(1, 0);
-            break;
-          case 1:
-            // Пользователь в пригороде
-            displayDelivery(1, distance)
-            break;
-        }
-      },
+      onCalcDeliveryFinish: onCalcDeliveryFinish,
       onCalcDeliveryError: function() {
         displayDelivery(-2);
       },
       onPickupCity: function(data) {
         displayPickups(data);
+        document.getElementById("city_input").setAttribute("placeholder", data.city);
       },
       onPickupCityError: function() {
       },
+      onPickupCitiesList: function(cities) {
+        autocomplete(document.getElementById("city_input"), cities, {
+          onBlur: onCitiesListBlur,
+          onSelect: onCitySelect,
+        });
+      },
     });
-    window.idm.calcDelivery();
-  });
 
+    window.idm.getPickupCitiesList();
 
-/*
-  citySelector = new autoComplete({
-            placeHolder: "Search for Food...",
-            data: {
-                src: ["Sauce - Thousand Island", "Wild Boar - Tenderloin", "Goat - Whole Cut"],
-                cache: true,
-            },
-            resultItem: {
-                highlight: true
-            },
-            events: {
-                input: {
-                    selection: (event) => {
-                        const selection = event.detail.selection.value;
-                        citySelector.input.value = selection;
-                    }
-                }
-            }
-
-  });
-*/
+    if (city = getCookie('idm_city')) {
+      window.idm.getCityPickups(city, cargo);
+      if (isNaN(Number(delivery_location)))
+        window.idm.calcDelivery(city);
+    } else {
+      window.idm.calcDelivery();
+    }
 });
 
 //////////////////////////////////////////////
@@ -125,8 +112,7 @@ function onSwipe(event, index, element) {
 //////////////////////////////////////////////
 function displayPickups(data) {
   if (data.hasOwnProperty('city')) {
-    $('#city-spinner').hide();
-    $('#city').text(data.city).css('display', 'inline');
+    displayCity(data.city);
     $('#pickup-spinner').hide();
     $('#pickup-points').text(data.pickups + ' ' + num_word(data.pickups, ['пункт', 'пункта', 'пунктов']));
     switch (data.term) {
@@ -145,7 +131,17 @@ function displayPickups(data) {
     $('#pickup_price').html(pickup_price);
     $('#pickup').show();
     PICKUP_PRICE = data.price;
+
+    setCookie('idm_city', data.city, false);
   }
+}
+
+//////////////////////////////////////////////
+function displayCity(city) {
+  $('#city-spinner').hide();
+  $('#city').text(city)
+  if ($('.autocomplete').css("display") == "none")
+    $('#city').css('display', 'inline');
 }
 
 //////////////////////////////////////////////
@@ -181,8 +177,62 @@ function getDeliveryPriceStr(suburbDist) {
 }
 
 //////////////////////////////////////////////
+function onCityClick(e) {
+  e.preventDefault();
+  $(e.target).hide(0);
+  $('.autocomplete').show();
+  $('.autocomplete input').focus();
+}
+
+//////////////////////////////////////////////
+function onCitiesListBlur() {
+  $('.autocomplete').hide();
+  $('#city').show();
+}
+
+//////////////////////////////////////////////
+function onCitySelect(city) {
+  $('#city').text(city);
+
+  $('#pickup').hide();
+  $('#pickup-spinner').show();
+  window.idm.getCityPickups(city, cargo);
+
+  $('#delivery').hide();
+  $('#delivery-spinner').show();
+
+  clearCookie('idm_city');
+  clearCookie('idm_delivery_location');
+  clearCookie('idm_suburb_distance');
+
+  window.idm.calcDelivery(city, true);
+}
+
+//////////////////////////////////////////////
+function onCalcDeliveryFinish(delivery_location, distance) {
+  switch (Number(delivery_location)) {
+    case -1:
+      // Нет доставки
+      displayDelivery(-1);
+      break;
+    case 0:
+      // Пользователь в пределах города
+      displayDelivery(1, 0);
+      break;
+    case 1:
+      // Пользователь в пригороде
+      displayDelivery(1, Number(distance))
+      break;
+  }
+  setCookie('idm_delivery_location', delivery_location, false);
+  setCookie('idm_suburb_distance', distance, false);
+}
+
+
+//////////////////////////////////////////////
 function num_word(value, words) {
     cases = [2, 0, 1, 1, 1, 2];  
     return words[ (value%100>4 && value%100<20)? 2 : cases[(value%10<5)?value%10:5] ];  
 }
 
+});

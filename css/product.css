@@ -106,6 +106,14 @@ h1 {
 
 .product>.controls>.city {
 	grid-area: city;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.product>.controls>.city>*:first-child{
+	padding: var(--input-padding);
+	border: solid 1px transparent;
 }
 
 #city-spinner {

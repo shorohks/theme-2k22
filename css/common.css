@@ -265,7 +265,7 @@ ul.tabs li a:hover {
 	color: #0a2c4b;
 }
 
-input[type=text], textarea {
+input[type=text], input[type=search], textarea {
 	outline: none;
 	font: var(--font-default);
 	padding: var(--input-padding);

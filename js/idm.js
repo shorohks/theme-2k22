@@ -8,6 +8,7 @@ function InteractiveDeliveryMap(options) {
   var defaults = {
     hash: '#map',
     clear_hash_on_startup: true,
+    pickup_button: true,
     cargo: [],
     onPickupsReady: undefined,
     onCalcDeliveryFinish: undefined,
@@ -29,6 +30,7 @@ function InteractiveDeliveryMap(options) {
   this.cityPolygon = undefined;
   this.suburb_path = undefined;
   this.pickup_first_run = true;
+  this.need_set_bounds = true;
 
   if (this.options.clear_hash_on_startup && location.hash == this.options.hash)
     history.replaceState(undefined, document.title, ' ');
@@ -64,7 +66,7 @@ function InteractiveDeliveryMap(options) {
     geolocation_provider: 'auto',
     auto_open_custom_pickup: false,
     map_scale: 18,
-    pickup_button: true,
+    pickup_button: this.options.pickup_button,
     onReady: $.proxy(this.onYADCReady, this),
     onPickupSelect: $.proxy(this.onPickupSelectClick, this),
     cargo: this.options.cargo,
@@ -108,15 +110,17 @@ InteractiveDeliveryMap.prototype.showPickup = function(pvz_id) {
   var el = $(instance.element).find('.idm-modal > #pickupMapContainer');
   setTimeout(function() {
     // Если первое открытие - добавляем ПВЗ в ObjectManager (долгая операция) пока в окне крутится спиннер
-    if (instance.pickup_first_run)
+    if (instance.pickup_first_run) {
       el.yadc('addPVZToObjectManager');
+      instance.pickup_first_run = false;
+    }
     // Отображаем yadc
     el.show(0, function(){
       el.yadc('onMapSizeChange');
-      if (instance.pickup_first_run) {
+      if (instance.need_set_bounds) {
         setTimeout(function(){
           el.yadc('smartBounds');
-          instance.pickup_first_run = false;
+          instance.need_set_bounds = false;
         }, 100);
       } else
         el.yadc('updateMap');
@@ -233,10 +237,10 @@ InteractiveDeliveryMap.prototype.findDeliveryLocation = function(addr, coord) {
 /////////////////////////////////////////////////////////////////////////////////////////////
 //  Рассчёт стоимости доставки до адреса
 /////////////////////////////////////////////////////////////////////////////////////////////
-InteractiveDeliveryMap.prototype.calcDelivery = function(address) {
+InteractiveDeliveryMap.prototype.calcDelivery = function(address, force = false) {
 
   // Если адрес не поменялся, нечего делать
-  if (this.address !== undefined && address == this.address) {
+  if (this.address !== undefined && address == this.address && !force) {
     this.displayDeliveryMap();
     this.calcDeliveryFinish();
     return;
@@ -433,6 +437,44 @@ InteractiveDeliveryMap.prototype.getPickupCityByCoord = function(coord, cargo) {
       'site_id': 2,
       'latitude': coord[0],
       'longitude': coord[1],
+      'cargo': JSON.stringify([cargo || {}]),
+    },
+    }).done(function(data) {
+      if (instance.options.onPickupCity)
+        instance.options.onPickupCity(data);
+    }).fail(function(){
+      if (instance.options.onPickupCityError)
+        instance.options.onPickupCityError();
+    });
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+InteractiveDeliveryMap.prototype.getCityPickups = function(city, cargo) {
+  var instance = this;
+
+  // Определяем координаты города
+  instance.getDeliveryGeoLocator(city).then(function(result) {
+
+    if (result.geoObjects.getLength() == 0)
+      instance.calcDeliveryError("Could not geolocate '" + address + "'");
+
+    var coord = result.geoObjects.get(0).geometry.getCoordinates();
+    var el = $(instance.element).find('.idm-modal > #pickupMapContainer');
+    el.yadc('setMapCenter', coord, 18);
+    instance.need_set_bounds = true;
+  }, function(err) {
+    // Ошибка геолокации
+  });
+
+  // Запршиваем сколько ПВЗ в городе и стоимость выдачи
+  $.ajax({
+    url: '//api.yadc-js.ru/city.json',
+    type: 'POST',
+    cache: false,
+	dataType: 'json',
+    data: {
+      'site_id': 2,
+      'city': city,
       'cargo': JSON.stringify([cargo || {}]),
     },
     }).done(function(data) {

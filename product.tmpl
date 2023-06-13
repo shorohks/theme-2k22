@@ -11,14 +11,14 @@
   <script src="/theme/js/lib/swipe/swipe.js" type="text/javascript"></script>
   <script src="/theme/js/lib/fancybox/fancybox.umd.js" type="text/javascript"></script>
   <link href="/theme/js/lib/fancybox/fancybox.css" rel="stylesheet" media="all" />
-  <script src="/theme/js/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script>
-  <link href="/theme/js/lib/autocomplete/autocomplete.min.css" rel="stylesheet" media="all" />
+  <script src="/theme/js/lib/autocomplete/autocomplete.js" type="text/javascript"></script>
+  <link href="/theme/js/lib/autocomplete/autocomplete.css" rel="stylesheet" media="all" />
   <script src="/theme/js/product.js" type="text/javascript"></script>
-  <!-- <script src="/theme/js/map-calculator.js" type="text/javascript"></script> -->
-  <script src="https://api-maps.yandex.ru/2.1/?apikey=1d361db1-2796-4a44-80ea-487b93817c0a&lang=ru_RU" type="text/javascript"></script>
-  <script src="http://cdn.yadc-js.ru/yadc.js" type="text/javascript" charset="utf-8"></script>
+  <script src="//api-maps.yandex.ru/2.1/?apikey=1d361db1-2796-4a44-80ea-487b93817c0a&lang=ru_RU" type="text/javascript"></script>
+  <script src="//cdn.yadc-js.local/yadc.js" type="text/javascript" charset="utf-8"></script>
   <link href="/theme/css/idm.css" rel="stylesheet" media="all" />
   <script src="/theme/js/idm.js" type="text/javascript"></script>
+  <script src="/theme/js/utils.js" type="text/javascript"></script>
 
 </head>
 <body>
@@ -87,8 +87,14 @@
           </div>
         </div>       
         <div class="city">
-          Ваш город: <i class="powericon-spinner powericon-pulse" id="city-spinner"></i> <a href="#" class="dotted" id="city"></a>
-          <!-- <input id="autoComplete" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off"> -->
+          <div>Ваш город:</div>
+          <div>
+            <i class="powericon-spinner powericon-pulse" id="city-spinner"></i>
+            <a href="#" class="dotted" id="city"></a>
+            <div class="autocomplete" style="display: none;">
+              <input id="city_input" type="search" spellcheck="false" placeholder="Город">
+            </div>
+          </div>
         </div>
         <div class="delivery">
           <div>
@@ -141,8 +147,6 @@
     DELIVERY_FREE_LIMIT = <TMPL_VAR NAME="DELIVERY_FREE_LIMIT">;
     DELIVERY_EXTRA_PAY = <TMPL_VAR NAME="DELIVERY_EXTRA_PAY">;
   </script>
-
-  <TMPL_INCLUDE FILE="_pickups.tmpl">
 
 </body>
 </html>
