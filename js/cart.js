@@ -13,7 +13,19 @@ cart = new Vue({
     delivery: 0,
     payer: 1,
     pay: 1,
-    address: undefined,
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    comments: '',
+    yur_payer: '',
+    yur_address: '',
+    yur_inn: '',
+    yur_kpp: '',
+    yur_rs: '',
+    yur_bank: '',
+    yur_ks: '',
+    yur_bik: '',
     distance: 0,
     calculating_delivery: false,
     calculating_pickup: false,
@@ -21,6 +33,8 @@ cart = new Vue({
     pvz: undefined,
     ymaps_ready: false,
     pickups_ready: false,
+    inprogress: false,
+    order_num: undefined,
   },
   methods: {
     getProductSum: getProductSum,
@@ -44,6 +58,8 @@ cart = new Vue({
     onPickupsReady: onPickupsReady,
     getCargo: getCargo,
     updateCargo: updateCargo,
+    validate: validate,
+    onSubmit: onSubmit,
   },
   computed: {
     cartCost: getCartCost,
@@ -313,6 +329,101 @@ function onCalcPickupError(err) {
 /////////////////////////////////////////////////////////////
 function onPickupsReady() {
   this.pickups_ready = true;
+}
+
+/////////////////////////////////////////////////////////////
+function validate() {
+  // Задан адрес доставки?
+  if (this.delivery == this.DELIVERY_COURIER && String(this.address).length < 5 ) {
+    alert('Укажите адрес доставки');
+    return false;
+  }
+  // Задан пункт выдачи?
+  if (this.delivery == this.DELIVERY_PICKUP && this.pvz === undefined ) {
+    alert('Выберите пункт выдачи');
+    return false;
+  }
+  // Указан получатель?
+  if (String(this.name).length < 3 ) {
+    alert('Укажите Ф.И.О получателя');
+    return false;
+  }
+  // Указан телефон?
+  if (String(this.phone).length < 5 ) {
+    alert('Укажите контактный телефон');
+    return false;
+  }
+  // Указан e-mail при безналичной оплате?
+  if (this.pay == this.PAY_BILL && String(this.email).length < 5 ) {
+    alert('Укажите e-mail для получения счёта');
+    return false;
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////////////////
+function onSubmit() {
+  if (this.inprogress)
+    return;
+  var instance = this;
+  if (instance.validate()) {
+    instance.inprogress = true;
+    var tt = {
+      dellin: 3,
+      cdek: 5,
+    }
+    var data = {
+      lname: instance.name,
+      phone: instance.phone,
+      comments: instance.comments,
+      customer: instance.payer,
+      payment: instance.pay,
+      delivery: instance.delivery,
+      address: instance.address,
+      yur_payer: instance.yur_payer,
+      yur_address: instance.yur_address,
+      yur_inn: instance.yur_inn,
+      yur_kpp: instance.yur_kpp,
+      yur_rs: instance.yur_rs,
+      yur_bank: instance.yur_bank,
+      yur_ks: instance.yur_ks,
+      yur_bik: instance.yur_bik,
+      email: instance.email,
+    };
+    if (instance.pay == instance.PAY_BILL && instance.payer == instance.PAYER_INDIVIDUAL) {
+      data['fiz_fname'] = instance.name;
+    }
+    if (instance.delivery == instance.DELIVERY_PICKUP) {
+      data['delivery_city'] = instance.pvz.city;
+      if (instance.pvz.service_code === 'custom') {
+        data['delivery'] = 1;
+      } else {
+        data['transport_company'] = tt[instance.pvz.service_code];
+      }
+    }
+    $.ajax({
+      type: 'POST',
+      url: '/order.php',
+      dataType: 'html',
+      data: data,
+      cache: false,
+      beforeSend : function(req) {},
+      complete: function() {
+        instance.inprogress = false;
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        errorMsg(AJAXErrorMessage(xhr, thrownError));
+      },
+      success: function(data) {
+        var res = data.match(/Order: (\d+)/i);
+        if (res.length == 2) {
+          instance.order_num = parseInt(res[1]);
+        } else {
+          errorMsg('Неизвестная ошибка. Попробуйте еще раз.');
+        }
+      },
+    });
+  }
 }
 
 });

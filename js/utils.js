@@ -25,3 +25,29 @@ function getCookieHost() {
   host = host.replace(/^www\./,'')
   return host;
 }
+
+////////////////////////////////////////////////////////////////////////////
+function AJAXErrorMessage(jqXHR, exception) {
+  if (jqXHR.status === 0) {
+    return ('Нет сети или ошибка DNS');
+  } else if (jqXHR.status == 404) {
+    return ('Запрашиваемае действие недоступно на сервере [404]');
+  } else if (jqXHR.status == 500) {
+    return ('Внутренняя ошибка сервера [500]');
+  } else if (exception === 'parsererror') {
+    return ('Неверная структура ответа сервера (JSON is invalid)');
+  } else if (exception === 'timeout') {
+    return ('Превышен срок ожидания ответа сервера');
+  } else if (exception === 'abort') {
+    return ('Запрос прерван');
+  } else if (exception.name === 'SyntaxError') {
+    return ('Неверная структура ответа сервера (' + exception.message + ')');
+  } else {
+    return ('Неизвестная ошибка - ' + jqXHR.responseText);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////
+function errorMsg(msg) {
+  alert('Ошибка: ' + msg);
+}

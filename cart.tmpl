@@ -71,6 +71,10 @@
 
   <script type="x-template" id="cartapp-template">
     <div id="cartapp">
+      <template v-if="order_num">
+        Заказ #{{order_num}} принят. В ближайшее время с вами свяжется наш менеджер.
+      </template>
+      <template v-else>
       <div class="cart">
 
         <div v-for="(product, index) in products" :key="product.code" >
@@ -175,7 +179,7 @@
         </div>
         <div class="form-row">
           <label>Получатель</label>
-          <input type="text">
+          <input v-model="name" type="text">
         </div>
         <div v-if="payer == PAYER_INDIVIDUAL && pay == PAY_BILL" class="form-row">
           <label>Прописка</label>
@@ -183,10 +187,10 @@
         </div>
         <div class="form-row col-2">
           <label>Телефон</label>
-          <input type="text">
+          <input v-model="phone" type="text">
           <label>e-mail</label>
-          <input v-if="pay == PAY_BILL" type="text">
-          <input v-else placeholder="(Необязательно)" type="text">
+          <input v-model="email" v-if="pay == PAY_BILL" type="text">
+          <input v-model="email" v-else placeholder="(Необязательно)" type="text">
         </div>
         <div class="form-row col-2">
           <label>Оплата</label>
@@ -203,40 +207,44 @@
         </div>
         <div v-if="payer == PAYER_LEGAL" class="form-row">
           <label>Плательщик</label>
-          <input type="text">
+          <input v-model="yur_payer" type="text">
         </div>
         <div v-if="payer == PAYER_LEGAL" class="form-row">
           <label>Юр.адрес</label>
-          <input type="text">
+          <input v-model="yur_address" type="text">
         </div>
         <div v-if="payer == PAYER_LEGAL" class="form-row col-2">
           <label>ИНН</label>
-          <input type="text">
+          <input v-model="yur_inn" type="text">
           <label>КПП</label>
-          <input type="text">
+          <input v-model="yur_kpp" type="text">
         </div>
         <div v-if="payer == PAYER_LEGAL" class="form-row col-2">
           <label>Р/сч</label>
-          <input type="text">
+          <input v-model="yur_rs" type="text">
           <label>Корр/сч</label>
-          <input type="text">
+          <input v-model="yur_ks" type="text">
         </div>
         <div v-if="payer == PAYER_LEGAL" class="form-row col-2">
           <label>Банк</label>
-          <input type="text">
+          <input v-model="yur_bank" type="text">
           <label>БИК</label>
-          <input type="text">
+          <input v-model="yur_bik" type="text">
         </div>
         <div class="form-row">
           <label>Комментарии</label>
-          <textarea rows="3"></textarea>
+          <textarea v-model="comments" rows="3"></textarea>
         </div>
         <div class="controls">
-          <input type="submit" value="Подтвердить заказ" class="btn yellow">
+          <a v-on:click.prevent="onSubmit" href="#" class="btn yellow">
+            <template v-if="!inprogress">Подтвердить заказ</template>
+            <template v-else><i class="powericon-spinner powericon-pulse"></i></template>
+          </a>
         </div>
       </div>
 
     </div>
+    </template>
   </script>
 
   <TMPL_INCLUDE FILE="_footer.tmpl">
