@@ -143,19 +143,18 @@ ul.toc li:not(.normal) span:last-child {
 .btn {
 	text-decoration: none;
 	display: block;
-	font-weight: 700;
-	font-size: 1em;
-	text-transform: uppercase;
+	font-weight: var(--btn-font-weight);
+	font-size: var(--btn-font-size);
+	text-transform: var(--btn-text-transform);
 	text-align: center;
-	padding-top: 0.7em;
-	padding-bottom: 0.6em;
-	border: none;
+	padding: var(--btn-padding);
+	border: var(--btn-border);
 	width: 100%;
 }
 
 .btn.yellow {
-	background-color: #fdce1b;
-	color: #000000;
+	background-color: var(--btn-color);
+	color: var(--btn-text-color);
 }
 
 .btn-group > * {

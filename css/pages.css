@@ -1,0 +1,83 @@
+article.page {
+	line-height: 1.4em;
+}
+
+article.page  h2 {
+	margin-top: 1.5em;
+}
+
+/* Для страницы "Монтаж и подключение" */
+
+.price-descr {
+	color: var(--text-light-color);
+}
+
+ul.price-list {
+	margin-top: 1.5rem !important;
+	margin-bottom: 1.5rem !important;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+ul.price-list li {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin: 0.5rem 0 0.5rem 0;
+}
+
+@media (max-width: 576px) {
+	ul.price-list li {
+		flex-direction: column;
+		background-color: var(--chip-background-color);
+		padding: var(--chip-padding);
+		border-radius: var(--chip-border-radius);
+	}
+}
+
+ul.price-list li .price-list-item {
+	padding-top: 0.1rem;
+}
+
+@media (max-width: 576px) {
+	ul.price-list li .price-list-item {
+		font-weight: bold;
+	}
+}
+
+
+ul.price-list li .price-list-value {
+	order: 3;
+}
+
+ul.price-list li .price-list-btn {
+	display: inline-block;
+	font-weight: var(--btn-font-weight);
+	font-size: var(--btn-font-size);
+	text-transform: var(--btn-text-transform);
+	padding: var(--btn-padding);
+	border: var(--btn-border);
+	background-color: var(--btn-color);
+	color: var(--btn-text-color);
+	text-decoration: none;
+	margin-left: 0.5rem;
+}
+
+ul.price-list li::after {
+	content: "";
+	flex-grow: 1;
+	height: 1rem;
+	order: 2;
+	border-bottom: 1px dotted #666;
+	margin: 0 0.3rem 0 0.3rem;
+}
+
+.price-note {
+	font-size: 0.9rem;
+	color: var(--text-light-color);
+}
+
+.price-note sup {
+	color: red;
+}
