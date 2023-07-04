@@ -81,3 +81,19 @@ ul.price-list li::after {
 .price-note sup {
 	color: red;
 }
+
+/* Для страницы "Оплата и Доставка" */
+
+.delivery_page .description {
+	color: var(--text-light-color);
+}
+
+.delivery_page table td:first-child {
+	vertical-align: top;
+}
+
+@media (max-width: 576px) {
+	.delivery_page table td:first-child {
+		display: none;
+	}
+}
