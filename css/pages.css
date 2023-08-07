@@ -97,3 +97,187 @@ ul.price-list li::after {
 		display: none;
 	}
 }
+
+/* Для страницы "Контакты" */
+
+.contacts_content {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	gap: 2em;
+}
+
+@media (max-width: 992px) {
+	.contacts_content {
+		flex-direction: column;
+	}
+}
+
+@media (max-width: 768px) {
+	.contacts_content {
+		flex-direction: column-reverse;
+	}
+}
+
+.contacts_content .contacts_table {
+	flex-grow: 1;
+}
+
+.contacts_content .contacts_sidebar {
+	width: 30%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+@media (max-width: 992px) {
+	.contacts_content .contacts_sidebar {
+		width: 50%;
+	}
+}
+
+@media (max-width: 768px) {
+	.contacts_content .contacts_sidebar {
+		width: 100%;
+	}
+}
+
+.contacts_table table {
+	width: 100%;
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+
+.contacts_table table td {
+	border-top: 1px solid #e6eaed;
+	border-bottom: 1px solid #e6eaed;
+	padding-top: 0.8em;
+	padding-bottom: 0.8em;
+}
+
+.contacts_table table td:first-child {
+	color: var(--text-light-color);
+	padding-right: 1em;
+	width: 30%;
+}
+
+.contacts_table table td  h2 {
+	color: var(--h2-color);
+}
+
+.contacts_table table td a {
+	text-decoration: none;
+}
+
+.contacts_content .contacts_sidebar>* {
+	border-color: var(--borders-color);
+	border-width: 1px;
+	border-style: solid;
+	border-radius: var(--input-border-radius);
+	box-sizing: border-box;
+	padding: 1em;
+}
+
+.contacts_content .contacts_sidebar>*:hover {
+    box-shadow: 0 5px 19px rgb(45 48 72 / 20%);
+}
+
+.contacts_content .contacts_sidebar strong {
+    display: block;
+    color: #444444;
+    font-weight: bold;
+    margin-bottom: 1.33em;
+}
+
+.contacts_content .contacts_sidebar .contacts_brief {
+	display: flex;
+	max-width: 100%;
+	gap: 1em;
+	overflow: hidden;
+	margin-bottom: 1.33em;
+}
+
+.contacts_content .contacts_sidebar .contacts_brief>*:first-child {
+	max-height: 5.4em;
+}
+
+.contacts_content .contacts_sidebar .contacts_brief>*:nth-child(2) {
+	overflow: hidden;
+}
+
+.contacts_content .contacts_sidebar .contacts_brief>*:nth-child(2)>* {
+	display: block;
+	line-height: 1.8em;
+}
+
+.contacts_content .contacts_sidebar .contacts_brief>*:nth-child(2) a {
+	color: var(--text-light-color);
+	text-decoration: none;
+	padding-left: 1.66rem;
+	background-size: 1rem 1rem;
+	background-repeat: no-repeat;
+	background-position: 0 center;
+	max-width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.contacts_content .contacts_sidebar .contacts_brief>*:nth-child(2) a:hover {
+	color: #0a2c4b;
+}
+
+.contacts_tel { background-image: url(../img/svg-icons.svg#phone); }
+.contacts_site { background-image: url(../img/svg-icons.svg#link); }
+.contacts_email { background-image: url(../img/svg-icons.svg#email); }
+
+.contacts_btns {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+}
+
+.contacts_btns a {
+	display: block;
+	text-decoration: none;
+	background-color: var(--catalog-btn-background);
+	background-color: #EEF4F7;
+	padding: var(--input-padding);
+	text-align: center;
+	font-weight: bold;
+	border-radius: var(--input-border-radius);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.contacts_social {
+	display: flex;
+	justify-content: center;
+	gap: 0.27rem;
+	margin-top: 1.33em;
+}
+
+.contacts_social a {
+	display: block;
+	height: 2.93rem;
+	width: 2.93rem;
+	background-size: 1.3rem 1.3rem;
+	background-repeat: no-repeat;
+	background-position: center center;
+	border: 1px solid var(--borders-color);
+	border-radius: var(--input-border-radius);
+}
+
+.contacts_social a:hover {
+	background-color: var(--borders-color);
+}
+
+.contacts_social a.contacts_telegram { background-image: url(../img/svg-icons.svg#telegram); }
+.contacts_social a.contacts_fb { background-image: url(../img/svg-icons.svg#fb); }
+.contacts_social a.contacts_ok { background-image: url(../img/svg-icons.svg#ok); }
+.contacts_social a.contacts_vk { background-image: url(../img/svg-icons.svg#vk); }
+.contacts_social a.contacts_twitter { background-image: url(../img/svg-icons.svg#twitter); }
+.contacts_social a.contacts_instagram { background-image: url(../img/svg-icons.svg#instagram); }
+.contacts_social a.contacts_youtube { background-image: url(../img/svg-icons.svg#youtube); }
+.contacts_social a.contacts_dzen { background-image: url(../img/svg-icons.svg#dzen); }
+.contacts_social a.contacts_whatsup { background-image: url(../img/svg-icons.svg#whatsup); }

@@ -5,6 +5,9 @@
 	--color-default: #001a34;
 	--link-color-default: #0d6efd;
 	--text-light-color: #88919d;
+	--h1-color: #001a34;
+	--h2-color: #001a34;
+	--breadcrumb-color: #88919D;
 	--borders-color: #e6e6e6;
 
 	--label-color: #88919d;
@@ -61,6 +64,4 @@
 	--footer-background-color: #F5F8FA;
 	--footer-border: 1px solid #e6eaed;
 	--footer-padding-bottom: 1rem;
-
-	--breadcrumb-color: #88919D;
 }
