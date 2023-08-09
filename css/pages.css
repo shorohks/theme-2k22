@@ -226,9 +226,9 @@ ul.price-list li::after {
 	color: #0a2c4b;
 }
 
-.contacts_tel { background-image: url(../img/svg-icons.svg#phone); }
-.contacts_site { background-image: url(../img/svg-icons.svg#link); }
-.contacts_email { background-image: url(../img/svg-icons.svg#email); }
+.contacts_tel { background-image: url(../img/icons.svg#phone); }
+.contacts_site { background-image: url(../img/icons.svg#link); }
+.contacts_email { background-image: url(../img/icons.svg#email); }
 
 .contacts_btns {
 	display: grid;
@@ -272,12 +272,12 @@ ul.price-list li::after {
 	background-color: var(--borders-color);
 }
 
-.contacts_social a.contacts_telegram { background-image: url(../img/svg-icons.svg#telegram); }
-.contacts_social a.contacts_fb { background-image: url(../img/svg-icons.svg#fb); }
-.contacts_social a.contacts_ok { background-image: url(../img/svg-icons.svg#ok); }
-.contacts_social a.contacts_vk { background-image: url(../img/svg-icons.svg#vk); }
-.contacts_social a.contacts_twitter { background-image: url(../img/svg-icons.svg#twitter); }
-.contacts_social a.contacts_instagram { background-image: url(../img/svg-icons.svg#instagram); }
-.contacts_social a.contacts_youtube { background-image: url(../img/svg-icons.svg#youtube); }
-.contacts_social a.contacts_dzen { background-image: url(../img/svg-icons.svg#dzen); }
-.contacts_social a.contacts_whatsup { background-image: url(../img/svg-icons.svg#whatsup); }
+.contacts_social a.contacts_telegram { background-image: url(../img/icons.svg#telegram); }
+.contacts_social a.contacts_fb { background-image: url(../img/icons.svg#fb); }
+.contacts_social a.contacts_ok { background-image: url(../img/icons.svg#ok); }
+.contacts_social a.contacts_vk { background-image: url(../img/icons.svg#vk); }
+.contacts_social a.contacts_twitter { background-image: url(../img/icons.svg#twitter); }
+.contacts_social a.contacts_instagram { background-image: url(../img/icons.svg#instagram); }
+.contacts_social a.contacts_youtube { background-image: url(../img/icons.svg#youtube); }
+.contacts_social a.contacts_dzen { background-image: url(../img/icons.svg#dzen); }
+.contacts_social a.contacts_whatsup { background-image: url(../img/icons.svg#whatsup); }
