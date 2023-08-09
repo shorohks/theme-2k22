@@ -5,7 +5,7 @@
         <i class="icon powericon-mail"></i>
         <div>
           Наша почта
-          <a href="mailto:<TMPL_IF NAME='EMAIL'><TMPL_VAR NAME='EMAIL'><TMPL_ELSE>info@<TMPL_VAR NAME='HTTP_HOST'></TMPL_IF>"><TMPL_IF NAME="EMAIL"><TMPL_VAR NAME="EMAIL"><TMPL_ELSE>info@<TMPL_VAR NAME="HTTP_HOST"></TMPL_IF></a>
+          <a href="mailto:<TMPL_VAR NAME='EMAIL'>"><TMPL_VAR NAME="EMAIL"></a>
         </div>
       </div>
       <div>
@@ -15,13 +15,15 @@
           <a href="tel:<TMPL_VAR NAME='PHONE'>">8&nbsp;<TMPL_VAR NAME='PHONE_CODE'>&nbsp;<TMPL_VAR NAME='PHONE_NUM'></a>
         </div>
       </div>
+      <TMPL_IF NAME="CITY">
       <div>
         <i class="icon powericon-home"></i>
         <div class="">
-          Москва
-          <div>ул.Таганская, д.1</div>
+          <TMPL_VAR NAME="CITY">
+          <div><TMPL_VAR NAME="ADDRESS"></div>
         </div>
       </div>
+      </TMPL_IF>
       <div>
         <i class="icon powericon-clock"></i>
         <div class="">
