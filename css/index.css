@@ -1,7 +1,16 @@
 .tiles {
+	margin-top: 3em;
+	margin-bottom: 3em;
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 	grid-gap: 1vw;
+}
+
+@media (max-width: 992px) {
+	.tiles {
+		margin-top: 2em;
+		margin-bottom: 2em;
+	}
 }
 
 @media (max-width: 576px) {
