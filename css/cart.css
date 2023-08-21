@@ -235,6 +235,12 @@ label {
 	.cart > div.delivery .trash  {
 		display: none;
     }
+	.cart > div.summary {
+		grid-template-areas: 
+			"qty amount";
+		grid-template-columns: 1fr 1fr;
+	}
+/*
     .cart .summary {
 		position: fixed;
 		left: 0;
@@ -247,6 +253,7 @@ label {
 		box-shadow: 0 0 5px rgb(136 145 157 / 10%);
 		padding-left: 0.58em;
 	}
+*/
 	.cart > .summary .pic,
 	.cart > .summary .product,
 	.cart > .summary .price,
@@ -254,7 +261,7 @@ label {
 		display: none;
     }
 	.cart > .summary .amount  {
-		text-align: left;
+		text-align: right;
     }
 }
 

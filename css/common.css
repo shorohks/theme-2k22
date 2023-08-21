@@ -155,6 +155,7 @@ ul.toc li:not(.normal) span:last-child {
 	padding: var(--btn-padding);
 	border: var(--btn-border);
 	width: 100%;
+	box-sizing: border-box;
 }
 
 .btn.yellow {
