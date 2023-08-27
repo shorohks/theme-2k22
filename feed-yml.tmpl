@@ -1,0 +1,62 @@
+<TMPL_HEADER NAME="content-type" VALUE="text/xml">
+<TMPL_VAR NAME="LANG_TAG">xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE yml_catalog SYSTEM "shops.dtd">
+<yml_catalog date="<TMPL_VAR NAME="DATE_TIME">">
+<shop>
+  <name><TMPL_VAR NAME="SHOP_NAME"></name>
+  <company><TMPL_IF NAME="COMPANY"><TMPL_VAR NAME="COMPANY"><TMPL_ELSE>Интернет-магазин электрооборудования</TMPL_IF></company>
+  <url><TMPL_VAR NAME="BASE_URL"></url>
+
+  <currencies>
+    <currency id="RUB" rate="1"/>
+  </currencies>
+
+  <categories>
+<TMPL_IF NAME="categories">
+<TMPL_LOOP NAME="categories">
+    <category id="<TMPL_VAR NAME="id">"><TMPL_VAR NAME="name"></category>
+</TMPL_LOOP>
+</TMPL_IF>
+  </categories>
+
+  <offers>
+<TMPL_IF NAME="goods">
+<TMPL_LOOP NAME="goods">
+    <offer id="<TMPL_VAR NAME="id">" type="vendor.model" available="<TMPL_IF NAME="available">true<TMPL_ELSE>false</TMPL_IF>" <TMPL_IF NAME="bid">bid="<TMPL_VAR NAME='bid'>"</TMPL_IF>>
+      <url><TMPL_VAR NAME="BASE_URL">product.php?product=<TMPL_VAR NAME='code'></url>
+      <price><TMPL_VAR NAME="price"></price>
+      <currencyId>RUB</currencyId>
+      <categoryId><TMPL_VAR NAME="cat_id"></categoryId>
+<TMPL_IF NAME='image_big'>
+      <picture><TMPL_VAR NAME="BASE_URL">products/img/<TMPL_VAR NAME='image_big'></picture>
+<TMPL_ELSE>
+      <picture><TMPL_VAR NAME="BASE_URL">products/img/<TMPL_VAR NAME='code'>.jpg</picture>
+</TMPL_IF>
+      <typePrefix><TMPL_IF NAME="typePrefix"><TMPL_VAR NAME="typePrefix"><TMPL_ELSE><TMPL_VAR NAME='category'></TMPL_IF></typePrefix>
+      <vendor><TMPL_VAR NAME='trademark'></vendor>
+      <model><TMPL_VAR NAME='trademark'> <TMPL_VAR NAME='model'></model>
+      <description><TMPL_VAR NAME='description'></description>
+      <manufacturer_warranty>true</manufacturer_warranty>
+      <delivery>true</delivery>
+      <pickup>true</pickup>
+      <store>false</store>
+<TMPL_IF NAME='article'>
+      <vendorCode><TMPL_VAR NAME='article'></vendorCode>
+</TMPL_IF>
+<TMPL_IF NAME='purchase_price'>
+      <purchase_price><TMPL_VAR NAME='purchase_price'></purchase_price>
+</TMPL_IF>
+<TMPL_IF NAME='barcode'>
+      <barcode><TMPL_VAR NAME='barcode'></barcode>
+</TMPL_IF>
+      <sales_notes><TMPL_IF NAME="sales_notes"><TMPL_VAR NAME='sales_notes'></TMPL_IF></sales_notes>
+    </offer>
+</TMPL_LOOP>
+</TMPL_IF>
+  </offers>
+
+  <promos>
+  </promos>
+
+</shop>
+</yml_catalog>
