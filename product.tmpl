@@ -115,6 +115,7 @@
       <ul class="tabs scrollable">
         <li page="page_details" class="active"><a href="#">Описание</a></li>
         <li page="page_char"><a href="#">Характеристики</a></li>
+        <li page="page_doc"><a href="#">Документация</a></li>
         <li page="page_reviews"><a href="#">Отзывы&nbsp;<span>0</span></a></li>
         <a id="pages" name="pages"></a>
       </ul>
@@ -124,6 +125,26 @@
           <TMPL_VAR NAME='text'>
         </div>
         <div id="page_char">
+        </div>
+        <div id="page_doc">
+          <TMPL_IF NAME="certificate">
+          <a href="<TMPL_VAR NAME='certificate'>">
+            <i class="powericon-certificate"></i>
+            <div>
+              Сертификат соответствия
+              <span><TMPL_VAR NAME='trademark'> <TMPL_VAR NAME='model'></span>
+            </div>
+          </a>
+          </TMPL_IF>
+          <TMPL_IF NAME="manual">
+          <a href="<TMPL_VAR NAME='manual'>">
+            <i class="powericon-pdf"></i>
+            <div>
+              Инструкция по эксплуатации
+              <span><TMPL_VAR NAME='trademark'> <TMPL_VAR NAME='model'></span>
+            </div>
+          </a>
+          </TMPL_IF>
         </div>
         <div id="page_reviews">
         </div>

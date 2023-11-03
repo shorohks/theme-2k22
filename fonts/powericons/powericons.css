@@ -85,6 +85,12 @@
 .powericon-help:before {
   content: "\e909";
 }
+.powericon-pdf:before {
+  content: "\e90a";
+}
+.powericon-certificate:before {
+  content: "\e90b";
+}
 .powericon-pulse {
   -webkit-animation: fa-spin 1s infinite steps(8);
   animation: fa-spin 1s infinite steps(8);

@@ -129,14 +129,14 @@ h1 {
 	grid-area: delivery;
 	display: flex;
 	gap: 1vw;
-	font-size: 0.9333em;
+	font-size: var(--smaller-font-size);
 	line-height: 1.7em;
 }
 
 .product>.controls>.delivery>div {
 	background-color: #f7f7f7;
 	border-radius: 8px;
-	padding: 0.70em 1em 0.70em 1em;
+	padding: var(--chip-padding);
 }
 
 .product>.controls>.delivery>div b{
@@ -167,6 +167,52 @@ h1 {
 #page_char table td {
 }
 
+#page_doc {
+	padding-top: 1em;
+	padding-bottom: 4em;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	justify-content: flex-start;
+	gap: 5em;
+}
+
+#page_doc > * {
+	text-decoration: none;
+	color: var(--color-default);
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	justify-content: flex-start;
+	gap: 0.75em;
+	border: solid 1px transparent;
+	padding: var(--chip-padding);
+}
+
+#page_doc > *:hover {
+	background-color: var(--chip-background-color);
+	border-color: var(--borders-color);
+	border-radius: 8px;
+}
+
+
+#page_doc > * > *:nth-child(1) {
+	font-size: 2.5em;
+	color: #ea1515;
+	padding-top: 0.15em;
+}
+
+#page_doc > * > *:nth-child(2) {
+	flex-grow: 1;
+}
+
+#page_doc > * > *:nth-child(2) > span {
+	display: block;
+	color: var(--text-light-color);
+	font-size: 0.9333em;
+	line-height: 1.7em;
+}
+
 @media (max-width: 992px) {
 	.product>.controls>.delivery {
 		flex-direction: column;
@@ -193,5 +239,11 @@ h1 {
             "controls controls"
 			"tabs tabs"
 			"pages pages";
+	}
+
+	#page_doc {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.5em;
 	}
 }
