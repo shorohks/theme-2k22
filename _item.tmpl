@@ -1,4 +1,9 @@
-<a href="product.php?product=<TMPL_VAR NAME='code'>" class="item card">
+<a href="product.php?product=<TMPL_VAR NAME='code'>" class="item card"
+  data-id="<TMPL_VAR NAME='code'>"
+  data-name="<TMPL_VAR NAME='trademark' escape='html'> <TMPL_VAR NAME='model' escape='html'>"
+  data-brand="<TMPL_VAR NAME='trademark' escape='html'>"
+  data-category="<TMPL_VAR NAME='category' escape='html'>"
+  data-price="<TMPL_IF NAME='price'><TMPL_VAR NAME='price'><TMPL_ELSE>0</TMPL_IF>">
   <div class="img">
     <img src="products/img/<TMPL_VAR NAME='image_big'>" alt="<TMPL_VAR NAME="trademark"> <TMPL_VAR NAME='model'>" title="<TMPL_VAR NAME="trademark"> <TMPL_VAR NAME='model'>"/>
   </div>

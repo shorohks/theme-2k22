@@ -52,6 +52,7 @@
       <TMPL_LOOP NAME="products">
         {
            code: "<TMPL_VAR NAME='code'>",
+           old_qty: <TMPL_VAR NAME='quantity'>,
            quantity: <TMPL_VAR NAME='quantity'>,
            category: "<TMPL_VAR NAME='category'>",
            trademark: "<TMPL_VAR NAME='trademark'>",
@@ -67,6 +68,22 @@
     DELIVERY_PRICE = <TMPL_VAR NAME='DELIVERY_PRICE'>;
     DELIVERY_FREE_LIMIT = <TMPL_VAR NAME='DELIVERY_FREE_LIMIT'>;
     DELIVERY_EXTRA_PAY = <TMPL_VAR NAME='DELIVERY_EXTRA_PAY'>;
+
+    <TMPL_IF NAME="just_added_products">
+    ecommerce_add([
+      <TMPL_LOOP NAME="just_added_products">
+        {
+           id: "<TMPL_VAR NAME='code'>",
+           name: "<TMPL_VAR NAME='trademark' escape='html'> <TMPL_VAR NAME='model' escape='html'>",
+           price: <TMPL_VAR NAME='price'>,
+           brand: "<TMPL_VAR NAME='trademark' escape='html'>",
+           category: "<TMPL_VAR NAME='category' escape='html'>",
+           quantity: <TMPL_VAR NAME='quantity'>,
+        },
+      </TMPL_LOOP>
+    ]);
+    </TMPL_IF>
+
   </script>
 
   <script type="x-template" id="cartapp-template">
@@ -243,8 +260,8 @@
         </div>
       </div>
 
-    </div>
     </template>
+    </div>
   </script>
 
   <TMPL_INCLUDE FILE="_footer.tmpl">

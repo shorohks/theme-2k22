@@ -122,6 +122,14 @@ function onDeleteProductClick(product){
   this.ajaxDeleteProduct(product);
   this.updateCounterIcon();
   this.updateCargo();
+  ecommerce_remove([{
+    'id': product.code,
+    'name': product.trademark + ' ' + product.model,
+    'brand': product.trademark,
+    'category': product.category,
+    'price': product.price,
+    'quantity': product.quantity,
+  }]);
 }
 
 /////////////////////////////////////////////
@@ -129,6 +137,21 @@ function onProductQuantityChange(product){
   this.ajaxUpdateCart();
   this.updateCounterIcon();
   this.updateCargo();
+  if (product.old_qty != product.quantity) {
+    prod = {
+      'id': product.code,
+      'name': product.trademark + ' ' + product.model,
+      'brand': product.trademark,
+      'category': product.category,
+      'price': product.price,
+      'quantity': Math.abs(product.quantity - product.old_qty),
+    }
+    if (product.quantity > product.old_qty)
+      ecommerce_add([prod]);
+    else
+      ecommerce_remove([prod]);
+    product.old_qty = product.quantity;
+  }
 }
 
 /////////////////////////////////////////////
@@ -418,6 +441,17 @@ function onSubmit() {
         var res = data.match(/Order: (\d+)/i);
         if (res.length == 2) {
           instance.order_num = parseInt(res[1]);
+          var order_products = instance.products.map(function(item){
+            return {
+              'id': item.code,
+              'name': item.trademark + ' ' + item.model,
+              'brand': item.trademark,
+              'category': item.category,
+              'price': item.price,
+              'quantity': item.quantity,
+            };
+          });
+          ecommerce_purchase(instance.order_num, order_products);
         } else {
           errorMsg('Неизвестная ошибка. Попробуйте еще раз.');
         }

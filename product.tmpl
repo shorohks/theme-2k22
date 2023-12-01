@@ -167,6 +167,14 @@
     DELIVERY_PRICE = <TMPL_VAR NAME="DELIVERY_PRICE">;
     DELIVERY_FREE_LIMIT = <TMPL_VAR NAME="DELIVERY_FREE_LIMIT">;
     DELIVERY_EXTRA_PAY = <TMPL_VAR NAME="DELIVERY_EXTRA_PAY">;
+
+    ecommerce_detail({
+      "id": "<TMPL_VAR NAME='code'>",
+      "name" : "<TMPL_VAR NAME='trademark'> <TMPL_VAR NAME='model'>",
+      "price": <TMPL_IF NAME="price"><TMPL_VAR NAME="price"><TMPL_ELSE>0</TMPL_IF>,
+      "brand": "<TMPL_VAR NAME='trademark'>",
+      "category": "<TMPL_VAR NAME='category'>",
+    });
   </script>
 
 </body>
