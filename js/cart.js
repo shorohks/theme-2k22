@@ -58,6 +58,7 @@ cart = new Vue({
     onPickupsReady: onPickupsReady,
     getCargo: getCargo,
     updateCargo: updateCargo,
+    getYMClientID: getYMClientID,
     validate: validate,
     onSubmit: onSubmit,
   },
@@ -355,6 +356,19 @@ function onPickupsReady() {
 }
 
 /////////////////////////////////////////////////////////////
+function getYMClientID() {
+  try {
+    if (!window.hasOwnProperty('Ya') || !window.Ya.hasOwnProperty('_metrika') ||
+        !window.Ya._metrika.hasOwnProperty('counter') ||
+        !window.Ya._metrika.counter.hasOwnProperty('getClientID'))
+      return undefined;
+    return window.Ya._metrika.counter.getClientID();
+  } catch(e) {
+    console.log("Ошибка " + e.name + ": " + e.message);
+  }
+}
+
+/////////////////////////////////////////////////////////////
 function validate() {
   // Задан адрес доставки?
   if (this.delivery == this.DELIVERY_COURIER && String(this.address).length < 5 ) {
@@ -412,6 +426,7 @@ function onSubmit() {
       yur_ks: instance.yur_ks,
       yur_bik: instance.yur_bik,
       email: instance.email,
+      ym_client_id: instance.getYMClientID(),
     };
     if (instance.pay == instance.PAY_BILL && instance.payer == instance.PAYER_INDIVIDUAL) {
       data['fiz_fname'] = instance.name;
