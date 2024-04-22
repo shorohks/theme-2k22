@@ -156,6 +156,14 @@ h2 {
 	font-size: 1.13rem;
 }
 
+.cart .coupon input {
+	padding: 6px 8px 4px 8px;
+    width: 5.75rem;
+}
+
+.cart .coupon .amount {
+	color: #a81010;
+}
 
 /******************************************************************************/
 
@@ -233,6 +241,17 @@ label {
 	.cart > div.delivery .price,
 	.cart > div.delivery .qty,
 	.cart > div.delivery .trash  {
+		display: none;
+    }
+	.cart > div.coupon {
+		grid-template-areas:
+			"product amount amount"
+			"price qty qty";
+		grid-template-columns: 1fr 2fr 18px;
+        row-gap: 0.2rem;
+	}
+	.cart > div.coupon .pic,
+	.cart > div.coupon .trash  {
 		display: none;
     }
 	.cart > div.summary {
