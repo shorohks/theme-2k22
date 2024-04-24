@@ -120,6 +120,15 @@
           </div>
         </div>
 
+        <div v-if="coupons.length" class="coupon">
+          <div class="pic"></div>
+          <div class="product"><span>Купон на скидку</span></div>
+          <div class="price"><template v-if="couponDiscountPercent">-{{ couponDiscountPercent }}%</template></div>
+          <div class="qty"><input type="text" v-model="coupon"></div>
+          <div class="amount"><template v-if="couponDiscount">-{{ couponDiscount|currency }}&nbsp;&#8381;</template></div>
+          <div class="trash"></div>
+        </div>
+
         <div class="delivery">
           <div class="pic"></div>
           <div class="product">
